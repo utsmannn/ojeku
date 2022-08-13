@@ -13,8 +13,8 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "Ojeku android"
-include ':customer'
-include ':driver'
+include ':application:customer'
+include ':application:driver'
 include ':features:auth'
 include ':features:transaction'
 include ':shared:network'
