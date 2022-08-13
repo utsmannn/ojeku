@@ -1,0 +1,24 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+apply from: "$rootDir/gradle/script/main.gradle"
+apply from: "$rootDir/gradle/script/main.localmodule.gradle"
+apply from: "$rootDir/gradle/script/main.dependencies.gradle"
+
+android {
+    defaultConfig {
+        applicationId "com.utsman.ojeku"
+        minSdk 21
+        targetSdk 32
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+}
+
+dependencies {
+    implementation project(":shared:core")
+}

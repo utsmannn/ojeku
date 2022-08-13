@@ -1,0 +1,6 @@
+dependencies {
+    implementation project(":features:auth")
+    implementation project(":features:transaction")
+    implementation project(":shared:network")
+    implementation project(":shared:utils")
+}

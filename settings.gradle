@@ -1,0 +1,22 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+rootProject.name = "Ojeku android"
+include ':customer'
+include ':driver'
+include ':features:auth'
+include ':features:transaction'
+include ':shared:network'
+include ':shared:utils'
+include ':shared:core'
