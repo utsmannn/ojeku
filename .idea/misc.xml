@@ -3,8 +3,16 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../../../layout/custom_preview.xml" value="0.26403985507246375" />
         <entry key="application/customer/src/main/res/drawable/ic_launcher_background.xml" value="0.2915" />
+        <entry key="application/customer/src/main/res/layout/activity_main.xml" value="0.2858974358974359" />
         <entry key="application/customer/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1365" />
+        <entry key="shared/core/src/main/res/drawable/bg_transport_card_stroke.xml" value="0.2915" />
+        <entry key="shared/core/src/main/res/drawable/bg_transport_card_white.xml" value="0.2915" />
+        <entry key="shared/core/src/main/res/drawable/ic_transport_bike.xml" value="0.2915" />
+        <entry key="shared/core/src/main/res/drawable/ic_transport_car.xml" value="0.2915" />
+        <entry key="shared/core/src/main/res/layout/activity_component_playground.xml" value="0.32072829131652664" />
+        <entry key="shared/core/src/main/res/layout/component_transport_card.xml" value="0.4874873292797744" />
       </map>
     </option>
   </component>

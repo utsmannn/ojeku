@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="TransportCardView">
+        <attr name="image" format="reference" />
+        <attr name="title" format="string" />
+        <attr name="isSelected" format="boolean"/>
+        <attr name="transportType" format="enum">
+            <enum name="bike" value="0"/>
+            <enum name="car" value="1"/>
+            <enum name="taxi" value="2"/>
+        </attr>
+    </declare-styleable>
+</resources>

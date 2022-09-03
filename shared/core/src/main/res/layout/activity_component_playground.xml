@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#1D000000">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <com.utsman.core.view.component.TransportCardView
+            android:id="@+id/transport_bike"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:transportType="car"/>
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>
