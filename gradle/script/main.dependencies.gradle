@@ -14,4 +14,10 @@ dependencies {
 
     // koin
     implementation 'io.insert-koin:koin-android:3.2.0'
+
+    // location & coroutine
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.2'
+    implementation 'com.google.android.gms:play-services-location:20.0.0'
+
+    implementation 'pub.devrel:easypermissions:3.0.0'
 }

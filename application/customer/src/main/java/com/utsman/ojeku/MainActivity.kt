@@ -1,17 +1,29 @@
 package com.utsman.ojeku
 
-import androidx.appcompat.app.AppCompatActivity
+import android.location.Location
 import android.os.Bundle
-import android.view.View
-import com.utsman.core.view.ComponentPlaygroundActivity
+import com.utsman.core.extensions.attachFragment
+import com.utsman.ojeku.databinding.ActivityMainBinding
+import com.utsman.utils.BindingActivity
+import com.utsman.utils.listener.findFragmentListener
 
-class MainActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+class MainActivity : BindingActivity<ActivityMainBinding>(), MainActivityListener {
+    override fun inflateBinding(): ActivityMainBinding {
+        return ActivityMainBinding.inflate(layoutInflater)
+    }
 
-        findViewById<View>(R.id.main_text).setOnClickListener {
-            ComponentPlaygroundActivity.launch(this)
-        }
+    private lateinit var homeTag: String
+
+    override fun onCreateBinding(savedInstanceState: Bundle?) {
+        homeTag = attachFragment(binding.mainFrame, HomeFragment::class)
+    }
+
+    private fun onLocation(data: Location) {
+        val instance = findFragmentListener<HomeFragmentListener>(homeTag)
+        instance?.onMessageFromActivity("anuan...")
+    }
+
+    override fun onLocationResult(data: Location) {
+        onLocation(data)
     }
 }

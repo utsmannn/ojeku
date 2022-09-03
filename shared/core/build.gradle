@@ -5,6 +5,7 @@ plugins {
 
 apply from: "$rootDir/gradle/script/main.gradle"
 apply from: "$rootDir/gradle/script/main.dependencies.gradle"
+apply from: "$rootDir/gradle/script/features.dependencies.gradle"
 apply from: "$rootDir/gradle/script/main.localmodule.gradle"
 
 android {

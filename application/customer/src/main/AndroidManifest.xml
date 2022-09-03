@@ -4,6 +4,8 @@
     package="com.utsman.ojeku">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
     <application
         android:name=".MainCustomer"
@@ -16,6 +18,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.OjekuAndroid"
         tools:targetApi="31">
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyC9JoGoHAlU8p8NIFMaaviQtZR9hq-SfS8" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
