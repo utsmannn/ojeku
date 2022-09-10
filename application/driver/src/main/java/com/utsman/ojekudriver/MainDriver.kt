@@ -1,7 +1,7 @@
 package com.utsman.ojekudriver
 
 import android.app.Application
-import com.utsman.core.KoinStarter
+import com.utsman.koin.KoinStarter
 
 class MainDriver : Application() {
 

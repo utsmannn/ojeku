@@ -18,15 +18,8 @@ class HomeRepositoryImpl(
         get() = _locationResult
 
     override suspend fun getLocation() {
-        /*locationManager.getLocationFlowEvent().collect {
-            println(" --- $it")
-            _locationResult.emit(it)
-        }*/
         locationManager.getLocationFlow()
             .mapStateEvent()
-            .collect {
-                println(" --- ASUUUU $it")
-                _locationResult.emit(it)
-            }
+            .collect(_locationResult)
     }
 }

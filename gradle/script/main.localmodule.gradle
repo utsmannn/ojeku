@@ -1,6 +1,7 @@
 dependencies {
     implementation project(":features:auth")
     implementation project(":features:transaction")
+    implementation project(":features:location-api")
     implementation project(":shared:network")
     implementation project(":shared:utils")
 }

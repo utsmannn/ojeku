@@ -26,7 +26,8 @@ open class MutableStateEventManager<T> : StateEventManager<T>(), FlowCollector<S
         onIdle: () -> Unit,
         onLoading: () -> Unit,
         onFailure: (throwable: Throwable) -> Unit,
-        onSuccess: (T) -> Unit
+        onSuccess: (T) -> Unit,
+        onEmpty: () -> Unit
     ) {
         createScope(scope).launch {
             flowEvent.collect {
@@ -37,6 +38,7 @@ open class MutableStateEventManager<T> : StateEventManager<T>(), FlowCollector<S
                     is StateEvent.Loading -> onLoading.invoke()
                     is StateEvent.Failure -> onFailure.invoke(it.exception)
                     is StateEvent.Success -> onSuccess.invoke(it.data)
+                    is StateEvent.Empty -> onEmpty.invoke()
                 }
             }
         }
@@ -63,7 +65,8 @@ open class MutableStateEventManager<T> : StateEventManager<T>(), FlowCollector<S
             onIdle: () -> Unit,
             onLoading: () -> Unit,
             onFailure: (throwable: Throwable) -> Unit,
-            onSuccess: (U) -> Unit
+            onSuccess: (U) -> Unit,
+            onEmpty: () -> Unit
         ) {
             stateEventManager.listener = {
                 when (this) {
@@ -83,6 +86,10 @@ open class MutableStateEventManager<T> : StateEventManager<T>(), FlowCollector<S
                         val mapData = mapper.invoke(this.data)
                         value = StateEvent.Success(mapData)
                         onSuccess.invoke(mapData)
+                    }
+                    is StateEvent.Empty -> {
+                        value = StateEvent.Empty()
+                        onEmpty.invoke()
                     }
                 }
 

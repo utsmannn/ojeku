@@ -1,0 +1,6 @@
+appId: com.utsman.ojeku
+---
+- launchApp
+- swipe:
+    start: 100, 200
+    end: 300, 400

@@ -5,4 +5,5 @@ interface StateEventSubscriber<T> {
     fun onLoading()
     fun onFailure(throwable: Throwable)
     fun onSuccess(data: T)
+    fun onEmpty()
 }

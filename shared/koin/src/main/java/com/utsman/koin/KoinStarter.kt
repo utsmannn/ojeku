@@ -1,7 +1,9 @@
-package com.utsman.core
+package com.utsman.koin
 
 import android.content.Context
 import com.utsman.auth.AuthModule
+import com.utsman.core.CoreModules
+import com.utsman.locationapi.LocationApiModule
 import com.utsman.network.NetworkModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -13,7 +15,8 @@ object KoinStarter {
         val modules = listOf(
             CoreModules.modules(),
             NetworkModule.modules(),
-            AuthModule.modules()
+            AuthModule.modules(),
+            LocationApiModule.modules()
         ) + featureModule
         startKoin {
             androidContext(context)

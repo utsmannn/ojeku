@@ -4,10 +4,12 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="../../../../layout/custom_preview.xml" value="0.26403985507246375" />
+        <entry key="application/customer/src/main/res/drawable/ic_baseline_search_24.xml" value="0.3055" />
         <entry key="application/customer/src/main/res/drawable/ic_launcher_background.xml" value="0.2915" />
         <entry key="application/customer/src/main/res/layout/activity_main.xml" value="0.2858974358974359" />
         <entry key="application/customer/src/main/res/layout/fragment_home.xml" value="0.2858974358974359" />
         <entry key="application/customer/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1365" />
+        <entry key="features/location-api/src/main/res/layout/activity_search_location.xml" value="0.3340224309800527" />
         <entry key="shared/core/src/main/res/drawable/bg_transport_card_stroke.xml" value="0.2915" />
         <entry key="shared/core/src/main/res/drawable/bg_transport_card_white.xml" value="0.2915" />
         <entry key="shared/core/src/main/res/drawable/ic_transport_bike.xml" value="0.2915" />

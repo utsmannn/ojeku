@@ -15,7 +15,8 @@ abstract class StateEventManager<T> {
         onIdle: () -> Unit = {},
         onLoading: () -> Unit = {},
         onFailure: (throwable: Throwable) -> Unit = {},
-        onSuccess: (T) -> Unit = {}
+        onSuccess: (T) -> Unit = {},
+        onEmpty: () -> Unit = {}
     )
 
     abstract fun <U> map(mapper: (T) -> U): StateEventManager<U>

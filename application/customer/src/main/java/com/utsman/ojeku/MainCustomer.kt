@@ -1,7 +1,7 @@
 package com.utsman.ojeku
 
 import android.app.Application
-import com.utsman.core.KoinStarter
+import com.utsman.koin.KoinStarter
 
 class MainCustomer : Application() {
 
