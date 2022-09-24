@@ -18,5 +18,7 @@ android {
 
 dependencies {
     implementation project(":shared:network")
+    implementation project(":shared:core")
+    implementation project(":shared:utils")
     implementation project(":shared:navigation")
 }

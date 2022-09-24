@@ -1,4 +1,4 @@
-package com.utsman.locationapi.ui
+package com.utsman.ojeku.cust.search
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -14,8 +14,6 @@ import com.utsman.locationapi.LocationWebServices
 import com.utsman.locationapi.Mapper
 import com.utsman.locationapi.StateLocationList
 import com.utsman.locationapi.entity.LocationData
-import kotlinx.coroutines.flow.FlowCollector
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class SearchLocationViewModel(

@@ -16,12 +16,14 @@
             <option value="$PROJECT_DIR$/features" />
             <option value="$PROJECT_DIR$/features/auth" />
             <option value="$PROJECT_DIR$/features/cust" />
+            <option value="$PROJECT_DIR$/features/cust/profile" />
             <option value="$PROJECT_DIR$/features/cust/search" />
             <option value="$PROJECT_DIR$/features/location-api" />
             <option value="$PROJECT_DIR$/features/transaction" />
             <option value="$PROJECT_DIR$/shared" />
             <option value="$PROJECT_DIR$/shared/core" />
             <option value="$PROJECT_DIR$/shared/koin" />
+            <option value="$PROJECT_DIR$/shared/navigation" />
             <option value="$PROJECT_DIR$/shared/network" />
             <option value="$PROJECT_DIR$/shared/utils" />
           </set>

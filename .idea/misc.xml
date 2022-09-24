@@ -9,6 +9,8 @@
         <entry key="application/customer/src/main/res/layout/activity_main.xml" value="0.2858974358974359" />
         <entry key="application/customer/src/main/res/layout/fragment_home.xml" value="0.2858974358974359" />
         <entry key="application/customer/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1365" />
+        <entry key="features/cust/profile/src/main/res/layout/fragment_profile.xml" value="0.10397430081924142" />
+        <entry key="features/cust/search/src/main/res/layout/fragment_search.xml" value="0.15305659081771306" />
         <entry key="features/location-api/src/main/res/layout/activity_search_location.xml" value="0.3340224309800527" />
         <entry key="shared/core/src/main/res/drawable/bg_transport_card_stroke.xml" value="0.2915" />
         <entry key="shared/core/src/main/res/drawable/bg_transport_card_white.xml" value="0.2915" />

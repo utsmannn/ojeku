@@ -1,12 +1,10 @@
-package com.utsman.locationapi.ui
+package com.utsman.ojeku.cust.search
 
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.core.view.isVisible
 import com.utsman.core.extensions.ifNetworkError
-import com.utsman.core.extensions.ifStateEmpty
-import com.utsman.core.state.StateEvent
 import com.utsman.core.state.StateEventSubscriber
 import com.utsman.locationapi.databinding.ActivitySearchLocationBinding
 import com.utsman.locationapi.entity.LocationData
@@ -22,19 +20,6 @@ class SearchLocationActivity : BindingActivity<ActivitySearchLocationBinding>() 
     }
 
     override fun onCreateBinding(savedInstanceState: Bundle?) {
-
-//        viewModel.locationListLive.observe(this) {
-//            println(it)
-//            binding.progbar.isVisible = it is StateEvent.Loading
-//            when (it) {
-//                is StateEvent.Idle -> renderIdle()
-//                is StateEvent.Loading -> renderLoading()
-//                is StateEvent.Failure -> renderFailure(it.exception)
-//                is StateEvent.Success -> renderSuccess(it.data)
-//                is StateEvent.Empty -> renderEmpty()
-//            }
-//        }
-
         viewModel.subscribeLocationStateManager(object : StateEventSubscriber<List<LocationData>> {
             override fun onIdle() {
                 renderIdle()

@@ -3,7 +3,7 @@
     package="com.utsman.locationapi">
 
     <application>
-        <activity android:name=".ui.SearchLocationActivity"/>
+        <activity android:name="com.utsman.ojeku.cust.search.SearchLocationActivity"/>
     </application>
 
 </manifest>

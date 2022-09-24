@@ -2,8 +2,9 @@ package com.utsman.ojeku
 
 import android.location.Location
 import android.os.Bundle
-import com.utsman.core.extensions.attachFragment
-import com.utsman.locationapi.ui.SearchLocationActivity
+import com.utsman.navigation.attachFragment
+import com.utsman.navigation.replaceFragment
+import com.utsman.ojeku.cust.search.SearchLocationFragment
 import com.utsman.ojeku.databinding.ActivityMainBinding
 import com.utsman.utils.BindingActivity
 import com.utsman.utils.listener.findFragmentListener
@@ -16,10 +17,14 @@ class MainActivity : BindingActivity<ActivityMainBinding>(), MainActivityListene
     private lateinit var homeTag: String
 
     override fun onCreateBinding(savedInstanceState: Bundle?) {
-        homeTag = attachFragment(binding.mainFrame, HomeFragment::class)
+        homeTag = supportFragmentManager.attachFragment(binding.mainFrame, HomeFragment::class)
         binding.btnSearch.setOnClickListener {
-            SearchLocationActivity.launch(this)
+            navigateToSearchFragment()
         }
+    }
+
+    private fun navigateToSearchFragment() {
+        supportFragmentManager.replaceFragment(binding.mainFrame, SearchLocationFragment::class)
     }
 
     private fun onLocation(data: Location) {

@@ -84,6 +84,10 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomeFragmentListene
 
             findActivityListener<MainActivityListener>()?.onLocationResult(data)
         }
+
+        override fun onEmpty() {
+            println("----- location empty")
+        }
     }
 
     private fun actionFromActivity(message: String) {

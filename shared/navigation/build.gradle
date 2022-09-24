@@ -15,8 +15,3 @@ android {
         consumerProguardFiles "consumer-rules.pro"
     }
 }
-
-dependencies {
-    implementation project(":shared:network")
-    implementation project(":shared:navigation")
-}
