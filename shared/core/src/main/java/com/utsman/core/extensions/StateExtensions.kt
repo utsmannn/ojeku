@@ -1,7 +1,11 @@
 package com.utsman.core.extensions
 
+import android.util.MalformedJsonException
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
 import com.utsman.core.state.FlowState
 import com.utsman.core.state.exception.StateApiException
@@ -40,7 +44,22 @@ fun <T> ViewModel.convertEventToSubscriber(
     )
 }
 
-fun <T>Flow<T>.mapStateEvent(): FlowState<T> {
+fun <T> LiveData<StateEvent<T>>.subscribe(
+    lifecycleOwner: LifecycleOwner,
+    subscriber: StateEventSubscriber<T>
+) {
+    observe(lifecycleOwner) {
+        when (it) {
+            is StateEvent.Idle -> subscriber.onIdle()
+            is StateEvent.Loading -> subscriber.onLoading()
+            is StateEvent.Success -> subscriber.onSuccess(it.data)
+            is StateEvent.Failure -> subscriber.onFailure(it.exception)
+            is StateEvent.Empty -> subscriber.onEmpty()
+        }
+    }
+}
+
+fun <T> Flow<T>.mapStateEvent(): FlowState<T> {
     return this.catch {
         StateEvent.Failure<T>(it)
     }.map {
@@ -48,22 +67,28 @@ fun <T>Flow<T>.mapStateEvent(): FlowState<T> {
     }
 }
 
-fun <T, U>Response<T>.asFlowStateEvent(mapper: (T) -> U): FlowState<U> {
+fun <T, U> Response<T>.asFlowStateEvent(mapper: (T) -> U): FlowState<U> {
     return flow {
         emit(StateEvent.Loading())
         delay(2000)
         val emitData = try {
             val body = body()
             if (isSuccessful && body != null) {
-                val data = mapper.invoke(body)
-                if (data is List<*>) {
-                    if (data.isEmpty()) {
-                        StateEvent.Empty()
+                try {
+                    val data = mapper.invoke(body)
+                    if (data is List<*>) {
+                        if (data.isEmpty()) {
+                            StateEvent.Empty()
+                        } else {
+                            StateEvent.Success(data as U)
+                        }
                     } else {
-                        StateEvent.Success(data as U)
+                        StateEvent.Success(data)
                     }
-                } else {
-                    StateEvent.Success(data)
+                } catch (e: JsonSyntaxException) {
+                    StateEvent.Failure(e)
+                } catch (e: Throwable) {
+                    StateEvent.Failure(e)
                 }
 
             } else {
@@ -71,6 +96,10 @@ fun <T, U>Response<T>.asFlowStateEvent(mapper: (T) -> U): FlowState<U> {
                 StateEvent.Failure(throwable)
             }
         } catch (e: Throwable) {
+            StateEvent.Failure(e)
+        } catch (e: MalformedJsonException) {
+            StateEvent.Failure(e)
+        } catch (e: JsonSyntaxException) {
             StateEvent.Failure(e)
         }
 
@@ -87,5 +116,23 @@ fun Throwable.ifStateEmpty(action: (StateDataEmptyException) -> Unit) {
 fun Throwable.ifNetworkError(action: (StateApiException) -> Unit) {
     if (this is StateApiException) {
         action.invoke(this)
+    }
+}
+
+fun <T> StateEvent<T>.onSuccess(action: T.() -> Unit) {
+    if (this is StateEvent.Success) {
+        action.invoke(data)
+    }
+}
+
+fun <T> StateEvent<T>.onLoading(action: () -> Unit) {
+    if (this is StateEvent.Loading) {
+        action.invoke()
+    }
+}
+
+fun <T> StateEvent<T>.onFailure(action: Throwable.() -> Unit) {
+    if (this is StateEvent.Failure) {
+        action.invoke(exception)
     }
 }

@@ -1,6 +1,7 @@
 package com.utsman.ojeku.cust.search
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.core.view.isVisible
 import com.utsman.core.extensions.ifNetworkError
 import com.utsman.core.state.StateEventSubscriber
@@ -20,7 +21,12 @@ class SearchLocationFragment : BindingFragment<FragmentSearchBinding>() {
         return FragmentSearchBinding.inflate(layoutInflater)
     }
 
+    private val formType: Int by lazy {
+        arguments?.getInt("formType", 1) ?: 1
+    }
+
     override fun onCreateBinding(savedInstanceState: Bundle?) {
+        Toast.makeText(context, formType.toString(), Toast.LENGTH_SHORT).show()
         viewModel.subscribeLocationStateManager(object : StateEventSubscriber<List<LocationData>> {
             override fun onIdle() {
                 renderIdle()

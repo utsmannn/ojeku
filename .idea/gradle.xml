@@ -16,6 +16,7 @@
             <option value="$PROJECT_DIR$/features" />
             <option value="$PROJECT_DIR$/features/auth" />
             <option value="$PROJECT_DIR$/features/cust" />
+            <option value="$PROJECT_DIR$/features/cust/home" />
             <option value="$PROJECT_DIR$/features/cust/profile" />
             <option value="$PROJECT_DIR$/features/cust/search" />
             <option value="$PROJECT_DIR$/features/location-api" />

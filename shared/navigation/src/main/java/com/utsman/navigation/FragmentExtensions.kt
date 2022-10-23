@@ -1,5 +1,6 @@
 package com.utsman.navigation
 
+import android.os.Bundle
 import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -26,13 +27,29 @@ fun <T: Fragment>FragmentManager.attachFragment(
 fun <T: Fragment>FragmentManager.replaceFragment(
     frameLayout: FrameLayout,
     kClass: KClass<T>,
+    backstackName: String? = null,
+    bundle: Bundle? = null
+): String {
+    val tag = kClass.qualifiedName.orEmpty()
+    val newBackstackName = backstackName ?: tag
+    this.beginTransaction()
+        .replace(frameLayout.id, kClass.java, bundle, tag)
+        .addToBackStack(newBackstackName)
+        .commit()
+
+    return tag
+}
+
+fun <T: Fragment>FragmentManager.addFragment(
+    frameLayout: FrameLayout,
+    kClass: KClass<T>,
     backstackName: String? = null
 ): String {
     val instance = kClass.java.newInstance()
     val tag = kClass.qualifiedName.orEmpty()
     val newBackstackName = backstackName ?: tag
     this.beginTransaction()
-        .replace(frameLayout.id, instance, tag)
+        .add(frameLayout.id, instance, tag)
         .addToBackStack(newBackstackName)
         .commit()
 

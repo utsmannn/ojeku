@@ -1,6 +1,7 @@
 package com.utsman.locationapi
 
 import com.utsman.locationapi.response.LocationResponse
+import com.utsman.locationapi.response.ReverseLocationResponse
 import com.utsman.network.RetrofitBuilder
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -16,8 +17,14 @@ interface LocationWebServices {
         @Query(QueryName.SEARCH_COORDINATE) coordinate: String
     ): Response<LocationResponse>
 
+    @GET(EndPoint.REVERSE)
+    suspend fun reverseLocation(
+        @Query(QueryName.SEARCH_COORDINATE) coordinate: String
+    ): Response<ReverseLocationResponse>
+
     object EndPoint {
         internal const val SEARCH = "/api/location/search"
+        internal const val REVERSE = "/api/location/reserve"
     }
 
     object QueryName {
