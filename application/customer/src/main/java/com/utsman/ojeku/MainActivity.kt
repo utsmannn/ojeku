@@ -2,10 +2,10 @@ package com.utsman.ojeku
 
 import android.location.Location
 import android.os.Bundle
-import android.widget.Toast
 import androidx.core.os.bundleOf
+import com.utsman.core.extensions.onFailure
 import com.utsman.locationapi.entity.LocationData
-import com.utsman.navigation.addFragment
+import com.utsman.navigation.activityNavigationCust
 import com.utsman.navigation.attachFragment
 import com.utsman.navigation.replaceFragment
 import com.utsman.ojeku.cust.search.SearchLocationFragment
@@ -18,6 +18,7 @@ import com.utsman.utils.listener.findFragmentListener
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : BindingActivity<ActivityMainBinding>(), MainActivityListener {
     override fun inflateBinding(): ActivityMainBinding {
@@ -31,8 +32,24 @@ class MainActivity : BindingActivity<ActivityMainBinding>(), MainActivityListene
 
     private var currentLocation: Location? = null
 
+    private val mainViewModel: MainViewModel by viewModel()
+
     private fun getFragmentListener(): HomeFragmentListener? {
         return findFragmentListener(homeTag)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        mainViewModel.getCurrentUser()
+        mainViewModel.userState.observe(this) { state ->
+            println("OJEKU =======")
+            println(state)
+            println("OJEKU =======")
+            state.onFailure {
+                activityNavigationCust().authActivity(this@MainActivity)
+                finish()
+            }
+        }
     }
 
     override fun onCreateBinding(savedInstanceState: Bundle?) {
@@ -71,7 +88,9 @@ class MainActivity : BindingActivity<ActivityMainBinding>(), MainActivityListene
 
     override fun navigateToSearchLocation(formType: Int) {
         val bundleForm = bundleOf(
-            "formType" to formType
+            "formType" to formType,
+            "location_from" to fromLocation,
+            "location_dest" to destLocation
         )
         supportFragmentManager.replaceFragment(binding.mainFrame, SearchLocationFragment::class, bundle = bundleForm)
     }

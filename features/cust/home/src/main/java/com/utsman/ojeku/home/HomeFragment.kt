@@ -4,6 +4,7 @@ import android.Manifest
 import android.location.Location
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
@@ -15,7 +16,9 @@ import com.utsman.core.view.component.InputLocationView
 import com.utsman.locationapi.entity.LocationData
 import com.utsman.ojeku.home.databinding.FragmentHomeBinding
 import com.utsman.utils.BindingFragment
+import com.utsman.utils.isGrantedLocation
 import com.utsman.utils.listener.findActivityListener
+import com.utsman.utils.snackBar
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.EasyPermissions
@@ -28,6 +31,28 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomeFragmentListene
 
     private val viewModel: HomeViewModel by viewModel()
     private lateinit var map: GoogleMap
+
+    private val locationPermissionRequest = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        when {
+            permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
+                viewModel.getLocation()
+            }
+            permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
+                requestPermission()
+            }
+            else -> {
+                requestPermission()
+            }
+        }
+    }
+
+    private fun requestPermission() {
+        locationPermissionRequest.launch(
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+        )
+    }
 
     override fun inflateBinding(): FragmentHomeBinding {
         return FragmentHomeBinding.inflate(layoutInflater)
@@ -64,20 +89,10 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomeFragmentListene
 
     @AfterPermissionGranted(value = RC_LOCATION)
     private fun getLocationWithPermission() {
-        val fineLocation = Manifest.permission.ACCESS_FINE_LOCATION
-        val coarseLocation = Manifest.permission.ACCESS_COARSE_LOCATION
-        context?.let {
-            if (EasyPermissions.hasPermissions(it, fineLocation, coarseLocation)) {
-                // get location
-                viewModel.getLocation()
-            } else {
-                EasyPermissions.requestPermissions(
-                    this,
-                    "Granted for location",
-                    RC_LOCATION,
-                    fineLocation, coarseLocation
-                )
-            }
+        if (context?.isGrantedLocation() == false) {
+            requestPermission()
+        } else {
+            viewModel.getLocation()
         }
     }
 

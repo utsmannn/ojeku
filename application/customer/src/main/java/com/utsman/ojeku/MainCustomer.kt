@@ -9,7 +9,8 @@ class MainCustomer : Application() {
     override fun onCreate() {
         super.onCreate()
         KoinStarter.onCreate(this, listOf(
-            HomeModule.module()
+            HomeModule.module(),
+            MainModule.modules()
         ))
     }
 }

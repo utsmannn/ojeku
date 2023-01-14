@@ -67,10 +67,42 @@ fun <T> Flow<T>.mapStateEvent(): FlowState<T> {
     }
 }
 
+fun <T, U> Response<T>.reducer(mapper: (T) -> U): StateEvent<U> {
+    return try {
+        val body = body()
+        if (isSuccessful && body != null) {
+            try {
+                val data = mapper.invoke(body)
+                if (data is List<*>) {
+                    if (data.isEmpty()) {
+                        StateEvent.Empty()
+                    } else {
+                        StateEvent.Success(data as U)
+                    }
+                } else {
+                    StateEvent.Success(data)
+                }
+            } catch (e: JsonSyntaxException) {
+                StateEvent.Failure(e)
+            } catch (e: Throwable) {
+                StateEvent.Failure(e)
+            }
+
+        } else {
+            val throwable = StateApiException(message(), code())
+            StateEvent.Failure(throwable)
+        }
+    } catch (e: Throwable) {
+        StateEvent.Failure(e)
+    } catch (e: MalformedJsonException) {
+        StateEvent.Failure(e)
+    } catch (e: JsonSyntaxException) {
+        StateEvent.Failure(e)
+    }
+}
+
 fun <T, U> Response<T>.asFlowStateEvent(mapper: (T) -> U): FlowState<U> {
     return flow {
-        emit(StateEvent.Loading())
-        delay(2000)
         val emitData = try {
             val body = body()
             if (isSuccessful && body != null) {

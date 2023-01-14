@@ -1,5 +1,8 @@
 package com.utsman.auth
 
+import com.utsman.auth.request.SignRequest
+import com.utsman.auth.response.SignInResponse
+import com.utsman.auth.response.SignUpResponse
 import com.utsman.network.RetrofitBuilder
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -11,8 +14,8 @@ interface AuthWebServices {
 
     @POST(EndPoint.LOGIN)
     suspend fun login(
-        @Body request: Any
-    ): Response<Any>
+        @Body request: SignRequest
+    ): Response<SignInResponse>
 
     @POST(EndPoint.REGISTER_DRIVER)
     suspend fun registerDriver(
@@ -21,8 +24,8 @@ interface AuthWebServices {
 
     @POST(EndPoint.REGISTER_CUSTOMER)
     suspend fun registerCustomer(
-        @Body request: Any
-    ): Response<Any>
+        @Body request: SignRequest
+    ): Response<SignUpResponse>
 
     object EndPoint {
         private const val PREFIX = "/api/user"

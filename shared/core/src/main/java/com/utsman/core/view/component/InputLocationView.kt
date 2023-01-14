@@ -4,6 +4,7 @@ import android.content.Context
 import android.location.Location
 import android.util.AttributeSet
 import android.view.View
+import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.TextView
 import com.utsman.core.R
@@ -12,8 +13,8 @@ import com.utsman.core.extensions.findIdByLazy
 class InputLocationView(context: Context, attributeSet: AttributeSet) :
     FrameLayout(context, attributeSet) {
 
-    private val textViewFrom: TextView by findIdByLazy(R.id.tv_from)
-    private val textViewDest: TextView by findIdByLazy(R.id.tv_destination)
+    private val editTextViewFrom: EditText by findIdByLazy(R.id.et_from)
+    private val editTextViewDest: EditText by findIdByLazy(R.id.et_destination)
 
     data class InputLocationData(
         val location: Location = Location(""),
@@ -27,7 +28,7 @@ class InputLocationView(context: Context, attributeSet: AttributeSet) :
     var inputLocationFromData: InputLocationData
         get() = _inputLocationFromData
         set(value) {
-            textViewFrom.text = value.name
+            editTextViewFrom.setText(value.name)
             _inputLocationFromData = value
         }
 
@@ -35,15 +36,19 @@ class InputLocationView(context: Context, attributeSet: AttributeSet) :
     var inputLocationDestData: InputLocationData
         get() = _inputLocationDestData
         set(value) {
-            textViewDest.text = value.name
+            editTextViewDest.setText(value.name)
             _inputLocationDestData = value
         }
 
     init {
         inflate(context, R.layout.component_input_location, this)
 
-        textViewFrom.text = _inputLocationFromData.name
-        textViewDest.text = _inputLocationDestData.name
+        editTextViewFrom.hint = "Select location"
+        editTextViewDest.hint = "Select location"
+        /*editTextViewFrom.onFocusChangeListener =
+            OnFocusChangeListener { v, hasFocus ->
+
+            }*/
     }
 
     companion object {
@@ -52,15 +57,36 @@ class InputLocationView(context: Context, attributeSet: AttributeSet) :
         fun locationDataFail() = InputLocationData(name = "Failure, try again!")
     }
 
-    fun onFromClick(action: () -> Unit) {
-        textViewFrom.setOnClickListener {
+    fun onFromClick(action: () -> Unit = {}) {
+        editTextViewFrom.setText(_inputLocationFromData.name)
+
+        editTextViewFrom.isFocusable = false
+        editTextViewFrom.isClickable = true
+        editTextViewFrom.setOnClickListener {
             action.invoke()
         }
     }
 
-    fun onDestClick(action: () -> Unit) {
-        textViewDest.setOnClickListener {
+    fun onDestClick(action: () -> Unit = {}) {
+        editTextViewDest.isFocusable = false
+        editTextViewDest.isClickable = true
+        editTextViewDest.setOnClickListener {
             action.invoke()
+        }
+    }
+
+    fun setFocus(form: Int) {
+        when (form) {
+            1 -> {
+                editTextViewFrom.isFocusable = true
+                editTextViewFrom.isClickable = false
+                editTextViewFrom.requestFocus()
+            }
+            2 -> {
+                editTextViewDest.isFocusable = true
+                editTextViewDest.isClickable = false
+                editTextViewDest.requestFocus()
+            }
         }
     }
 }

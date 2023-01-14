@@ -4,13 +4,16 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.core.view.isVisible
 import com.utsman.core.extensions.ifNetworkError
+import com.utsman.core.extensions.toLocation
 import com.utsman.core.state.StateEventSubscriber
+import com.utsman.core.view.component.InputLocationView
 import com.utsman.locationapi.entity.LocationData
 import com.utsman.navigation.FragmentConnector
 import com.utsman.navigation.ProfileFragmentConnector
 import com.utsman.navigation.replaceFragment
 import com.utsman.ojeku.cust.search.databinding.FragmentSearchBinding
 import com.utsman.utils.BindingFragment
+import com.utsman.utils.snackBar
 import org.koin.android.ext.android.inject
 
 class SearchLocationFragment : BindingFragment<FragmentSearchBinding>() {
@@ -25,8 +28,36 @@ class SearchLocationFragment : BindingFragment<FragmentSearchBinding>() {
         arguments?.getInt("formType", 1) ?: 1
     }
 
+    private val fromLocationExtra by lazy {
+        arguments?.getParcelable("location_from") ?: LocationData()
+    }
+
+    private val destLocationExtra by lazy {
+        arguments?.getParcelable("location_dest") ?: LocationData()
+    }
+
     override fun onCreateBinding(savedInstanceState: Bundle?) {
         Toast.makeText(context, formType.toString(), Toast.LENGTH_SHORT).show()
+        binding.inputSearch.setFocus(formType)
+
+        viewModel.fromLocation = fromLocationExtra
+        viewModel.destLocation = destLocationExtra
+
+        binding.snackBar(viewModel.fromLocation.name)
+        if (viewModel.fromLocation.latLng.latitude != 0.0) {
+            binding.inputSearch.inputLocationFromData = InputLocationView.InputLocationData(
+                location = viewModel.fromLocation.latLng.toLocation(),
+                name = viewModel.fromLocation.address
+            )
+        }
+
+        if (viewModel.destLocation.latLng.latitude != 0.0) {
+            binding.inputSearch.inputLocationDestData = InputLocationView.InputLocationData(
+                location = viewModel.destLocation.latLng.toLocation(),
+                name = viewModel.destLocation.address
+            )
+        }
+
         viewModel.subscribeLocationStateManager(object : StateEventSubscriber<List<LocationData>> {
             override fun onIdle() {
                 renderIdle()
@@ -51,8 +82,8 @@ class SearchLocationFragment : BindingFragment<FragmentSearchBinding>() {
         })
 
         binding.btnSearch.setOnClickListener {
-            val name = binding.inputSearch.text.toString()
-            viewModel.getLocations(name)
+            //val name = binding.inputSearch.text.toString()
+            //viewModel.getLocations(name)
         }
         binding.btnProfile.setOnClickListener {
             val profileFragment = FragmentConnector.Profile.profileFragment

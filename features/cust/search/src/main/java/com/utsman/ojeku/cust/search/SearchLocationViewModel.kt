@@ -28,6 +28,9 @@ class SearchLocationViewModel(
     private val locationStateManager: StateEventManager<List<LocationData>>
         get() = _locationStateManager
 
+    var fromLocation: LocationData = LocationData()
+    var destLocation: LocationData = LocationData()
+
     fun getLocations(name: String) = locationStateManager.createScope(viewModelScope).launch {
         val coordinateString = "-6.2842147,106.8447178"
         webServices.searchLocation(name, coordinateString).asFlowStateEvent {

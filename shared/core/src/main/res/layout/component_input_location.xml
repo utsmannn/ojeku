@@ -53,23 +53,27 @@
             app:layout_constraintStart_toStartOf="@+id/gv_1"
             app:layout_constraintTop_toTopOf="@+id/gh_1" />
 
-        <TextView
-            android:id="@+id/tv_from"
+        <EditText
+            android:id="@+id/et_from"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="12dp"
             android:layout_marginBottom="6dp"
+            android:background="@null"
+            android:textSize="14sp"
             app:layout_constraintBottom_toTopOf="@+id/gh_1"
             app:layout_constraintEnd_toStartOf="@+id/gv_2"
             app:layout_constraintStart_toStartOf="@+id/gv_1"
             tools:text="Jl Cagar alam selatan 1" />
 
-        <TextView
-            android:id="@+id/tv_destination"
+        <EditText
+            android:id="@+id/et_destination"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="12dp"
             android:layout_marginTop="6dp"
+            android:background="@null"
+            android:textSize="14sp"
             app:layout_constraintEnd_toStartOf="@+id/gv_2"
             app:layout_constraintStart_toStartOf="@+id/gv_1"
             app:layout_constraintTop_toTopOf="@+id/gh_1"

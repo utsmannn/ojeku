@@ -2,6 +2,8 @@ package com.utsman.navigation
 
 import android.content.Context
 import android.content.Intent
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import kotlin.reflect.KClass
 
 fun Context.intentTo(className: String) {
@@ -13,4 +15,12 @@ fun Context.intentTo(className: String) {
 fun Context.intentTo(clazz: KClass<*>) {
     val intent = Intent(this, clazz.java)
     startActivity(intent)
+}
+
+private object Navigation : KoinComponent {
+    val activityNavigatorCustomer: ActivityNavigatorCustomer by inject()
+}
+
+fun activityNavigationCust(): ActivityNavigatorCustomer {
+    return Navigation.activityNavigatorCustomer
 }
