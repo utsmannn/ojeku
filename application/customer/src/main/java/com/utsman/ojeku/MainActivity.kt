@@ -54,10 +54,6 @@ class MainActivity : BindingActivity<ActivityMainBinding>(), MainActivityListene
 
     override fun onCreateBinding(savedInstanceState: Bundle?) {
         homeTag = supportFragmentManager.attachFragment(binding.mainFrame, HomeFragment::class)
-        binding.btnSearch.setOnClickListener {
-            navigateToSearchFragment()
-        }
-
         MainScope().launch {
             delay(1000)
             getFragmentListener()?.pushLoadingFormLocation()

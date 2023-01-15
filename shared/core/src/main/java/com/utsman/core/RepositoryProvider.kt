@@ -8,7 +8,7 @@ import retrofit2.Response
 open class RepositoryProvider {
 
     suspend fun <T, U>bindToState(stateFlow: MutableStateFlow<StateEvent<U>>, onFetch: suspend () -> Response<T>, mapper: (T) -> U) {
-        stateFlow.value = StateEvent.Idle()
+        stateFlow.value = StateEvent.Loading()
         val result = onFetch.invoke().reducer(mapper)
         stateFlow.value = result
     }

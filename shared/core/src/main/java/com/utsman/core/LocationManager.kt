@@ -19,6 +19,8 @@ import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 class LocationManager(private val context: Context) {
 
@@ -107,5 +109,9 @@ class LocationManager(private val context: Context) {
                 println("AAAAA -> $it")
                 lastLocation.invoke(it)
             }
+    }
+
+    companion object : KoinComponent {
+        val instance: LocationManager by inject()
     }
 }

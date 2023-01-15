@@ -53,31 +53,47 @@
             app:layout_constraintStart_toStartOf="@+id/gv_1"
             app:layout_constraintTop_toTopOf="@+id/gh_1" />
 
-        <EditText
-            android:id="@+id/et_from"
+        <HorizontalScrollView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="12dp"
             android:layout_marginBottom="6dp"
             android:background="@null"
-            android:textSize="14sp"
+            android:scrollbars="none"
             app:layout_constraintBottom_toTopOf="@+id/gh_1"
             app:layout_constraintEnd_toStartOf="@+id/gv_2"
-            app:layout_constraintStart_toStartOf="@+id/gv_1"
-            tools:text="Jl Cagar alam selatan 1" />
+            app:layout_constraintStart_toStartOf="@+id/gv_1">
 
-        <EditText
-            android:id="@+id/et_destination"
+            <EditText
+                android:id="@+id/et_from"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:textSize="14sp"
+                tools:text="Jl Cagar alam selatan 1" />
+
+        </HorizontalScrollView>
+
+        <HorizontalScrollView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="12dp"
             android:layout_marginTop="6dp"
             android:background="@null"
             android:textSize="14sp"
+            android:scrollbars="none"
             app:layout_constraintEnd_toStartOf="@+id/gv_2"
             app:layout_constraintStart_toStartOf="@+id/gv_1"
-            app:layout_constraintTop_toTopOf="@+id/gh_1"
-            tools:text="Stasiun depok lama" />
+            app:layout_constraintTop_toTopOf="@+id/gh_1">
+
+            <EditText
+                android:id="@+id/et_destination"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:textSize="14sp"
+                tools:text="Stasiun depok lama" />
+        </HorizontalScrollView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

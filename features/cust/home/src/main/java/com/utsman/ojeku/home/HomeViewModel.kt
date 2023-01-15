@@ -26,7 +26,6 @@ class HomeViewModel(
 
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
         throwable.printStackTrace()
-        println("ASUUUUUUUU -> ${throwable.message}")
         _throwable.value = throwable
     }
 

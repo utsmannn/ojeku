@@ -83,8 +83,10 @@ fun <T, U> Response<T>.reducer(mapper: (T) -> U): StateEvent<U> {
                     StateEvent.Success(data)
                 }
             } catch (e: JsonSyntaxException) {
+                println("OJEKUUU======== network json failure")
                 StateEvent.Failure(e)
             } catch (e: Throwable) {
+                println("OJEKUUU======== network failure")
                 StateEvent.Failure(e)
             }
 

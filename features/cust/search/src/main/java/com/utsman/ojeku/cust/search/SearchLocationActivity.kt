@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.core.view.isVisible
+import com.utsman.core.LocationManager
 import com.utsman.core.extensions.ifNetworkError
 import com.utsman.core.state.StateEventSubscriber
 import com.utsman.locationapi.databinding.ActivitySearchLocationBinding
@@ -20,32 +21,13 @@ class SearchLocationActivity : BindingActivity<ActivitySearchLocationBinding>() 
     }
 
     override fun onCreateBinding(savedInstanceState: Bundle?) {
-        viewModel.subscribeLocationStateManager(object : StateEventSubscriber<List<LocationData>> {
-            override fun onIdle() {
-                renderIdle()
-            }
 
-            override fun onLoading() {
-                renderLoading()
-            }
-
-            override fun onFailure(throwable: Throwable) {
-                renderFailure(throwable)
-            }
-
-            override fun onSuccess(data: List<LocationData>) {
-                renderSuccess(data)
-            }
-
-            override fun onEmpty() {
-                renderEmpty()
-            }
-
-        })
 
         binding.btnSearch.setOnClickListener {
             val name = binding.inputSearch.text.toString()
-            viewModel.getLocations(name)
+            LocationManager.instance.getLastLocation { location ->
+                viewModel.getLocations(name, location)
+            }
         }
     }
 

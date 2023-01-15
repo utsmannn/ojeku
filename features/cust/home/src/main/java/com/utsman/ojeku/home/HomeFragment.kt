@@ -178,14 +178,14 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomeFragmentListene
     override fun onDataLocation(from: LocationData, destination: LocationData) {
         binding.inputCardView.inputLocationFromData = InputLocationView.InputLocationData(
             location = from.latLng.toLocation(),
-            name = from.address.ifEmpty {
+            name = from.name.ifEmpty {
                 "Select location"
             }
         )
 
         binding.inputCardView.inputLocationDestData = InputLocationView.InputLocationData(
             location = destination.latLng.toLocation(),
-            name = destination.address.ifEmpty {
+            name = destination.name.ifEmpty {
                 "Select location"
             }
         )

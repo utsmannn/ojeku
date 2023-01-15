@@ -7,8 +7,13 @@ import android.view.View
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.core.widget.doOnTextChanged
 import com.utsman.core.R
+import com.utsman.core.extensions.changes
 import com.utsman.core.extensions.findIdByLazy
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.debounce
+import java.util.concurrent.TimeUnit
 
 class InputLocationView(context: Context, attributeSet: AttributeSet) :
     FrameLayout(context, attributeSet) {
@@ -25,10 +30,14 @@ class InputLocationView(context: Context, attributeSet: AttributeSet) :
 
     private var _inputLocationFromData: InputLocationData = InputLocationData()
 
+    private var isFromEnableTypingDefined = true
+    private var isDestinationEnableTypingDefined = true
+
     var inputLocationFromData: InputLocationData
         get() = _inputLocationFromData
         set(value) {
             editTextViewFrom.setText(value.name)
+            editTextViewFrom.clearFocus()
             _inputLocationFromData = value
         }
 
@@ -37,6 +46,7 @@ class InputLocationView(context: Context, attributeSet: AttributeSet) :
         get() = _inputLocationDestData
         set(value) {
             editTextViewDest.setText(value.name)
+            editTextViewDest.clearFocus()
             _inputLocationDestData = value
         }
 
@@ -45,10 +55,6 @@ class InputLocationView(context: Context, attributeSet: AttributeSet) :
 
         editTextViewFrom.hint = "Select location"
         editTextViewDest.hint = "Select location"
-        /*editTextViewFrom.onFocusChangeListener =
-            OnFocusChangeListener { v, hasFocus ->
-
-            }*/
     }
 
     companion object {
@@ -58,8 +64,8 @@ class InputLocationView(context: Context, attributeSet: AttributeSet) :
     }
 
     fun onFromClick(action: () -> Unit = {}) {
+        isFromEnableTypingDefined = false
         editTextViewFrom.setText(_inputLocationFromData.name)
-
         editTextViewFrom.isFocusable = false
         editTextViewFrom.isClickable = true
         editTextViewFrom.setOnClickListener {
@@ -68,6 +74,7 @@ class InputLocationView(context: Context, attributeSet: AttributeSet) :
     }
 
     fun onDestClick(action: () -> Unit = {}) {
+        isDestinationEnableTypingDefined = false
         editTextViewDest.isFocusable = false
         editTextViewDest.isClickable = true
         editTextViewDest.setOnClickListener {
@@ -89,4 +96,29 @@ class InputLocationView(context: Context, attributeSet: AttributeSet) :
             }
         }
     }
+
+    fun textChangesFrom(action: (String) -> Unit) {
+        editTextViewFrom.doOnTextChanged { text, start, before, count ->
+            action.invoke(text.toString())
+        }
+    }
+
+    fun textChangesDest(action: (String) -> Unit) {
+        editTextViewDest.doOnTextChanged { text, start, before, count ->
+            action.invoke(text.toString())
+        }
+    }
+
+    fun EditText.setEnableTyping(isEnable: Boolean) {
+        isFocusable = !isEnable
+        isClickable = isEnable
+    }
+
+    fun textFlowFrom() =
+        editTextViewFrom.changes()
+            .debounce(1000)
+
+    fun textFlowDest() =
+        editTextViewDest.changes()
+            .debounce(1000)
 }
