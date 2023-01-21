@@ -1,27 +1,33 @@
-package com.utsman.ojeku.home
+package com.utsman.ojeku.home.fragment
 
 import android.Manifest
 import android.location.Location
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
+import com.utsman.core.CoroutineBus
 import com.utsman.core.extensions.onSuccess
 import com.utsman.core.extensions.toLatLng
 import com.utsman.core.extensions.toLocation
 import com.utsman.core.state.StateEventSubscriber
 import com.utsman.core.view.component.InputLocationView
 import com.utsman.locationapi.entity.LocationData
+import com.utsman.navigation.replaceFragment
+import com.utsman.ojeku.home.viewmodel.HomeViewModel
+import com.utsman.ojeku.home.MainActivityListener
+import com.utsman.ojeku.home.R
 import com.utsman.ojeku.home.databinding.FragmentHomeBinding
+import com.utsman.ojeku.home.fragment.controlpanel.LocationListPanelControlFragment
 import com.utsman.utils.BindingFragment
 import com.utsman.utils.isGrantedLocation
 import com.utsman.utils.listener.findActivityListener
-import com.utsman.utils.snackBar
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import pub.devrel.easypermissions.AfterPermissionGranted
-import pub.devrel.easypermissions.EasyPermissions
 
 class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomeFragmentListener {
 
@@ -31,6 +37,8 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomeFragmentListene
 
     private val viewModel: HomeViewModel by viewModel()
     private lateinit var map: GoogleMap
+
+    private lateinit var panelTag: String
 
     private val locationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -50,7 +58,10 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomeFragmentListene
 
     private fun requestPermission() {
         locationPermissionRequest.launch(
-            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
         )
     }
 
@@ -85,6 +96,20 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomeFragmentListene
         binding.inputCardView.onDestClick {
             getActivityListener()?.navigateToSearchLocation(MainActivityListener.FormType.DEST)
         }
+
+        panelTag = childFragmentManager.replaceFragment(
+            binding.framePanelControl,
+            LocationListPanelControlFragment::class
+        )
+
+        CoroutineBus.getInstance()
+            .getLiveData<Pair<LocationData, LocationData>>("location_input_filled", lifecycleScope)
+            .observe(this) { (from, dest) ->
+                lifecycleScope.launch {
+                    getActivityListener()?.sendFromLocation(from)
+                    getActivityListener()?.sendDestinationLocation(dest)
+                }
+            }
     }
 
     @AfterPermissionGranted(value = RC_LOCATION)
@@ -179,14 +204,14 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomeFragmentListene
         binding.inputCardView.inputLocationFromData = InputLocationView.InputLocationData(
             location = from.latLng.toLocation(),
             name = from.name.ifEmpty {
-                "Select location"
+                "Find location"
             }
         )
 
         binding.inputCardView.inputLocationDestData = InputLocationView.InputLocationData(
             location = destination.latLng.toLocation(),
             name = destination.name.ifEmpty {
-                "Select location"
+                "Find location"
             }
         )
     }

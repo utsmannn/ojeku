@@ -1,4 +1,4 @@
-package com.utsman.ojeku.home
+package com.utsman.ojeku.home.repo
 
 import android.location.Location
 import com.utsman.core.state.FlowState

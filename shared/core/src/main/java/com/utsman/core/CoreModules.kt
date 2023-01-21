@@ -9,5 +9,6 @@ object CoreModules {
     fun modules() = module {
         single { LocationManager(androidContext()) }
         single { AppPreferences(get()) }
+        single { CoroutineBus() }
     }
 }

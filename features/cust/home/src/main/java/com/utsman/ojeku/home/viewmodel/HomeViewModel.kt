@@ -1,19 +1,15 @@
-package com.utsman.ojeku.home
+package com.utsman.ojeku.home.viewmodel
 
 import android.location.Location
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.utsman.core.extensions.convertEventToSubscriber
-import com.utsman.core.extensions.onFailure
-import com.utsman.core.extensions.onSuccess
-import com.utsman.core.state.StateEvent
 import com.utsman.core.state.StateEventSubscriber
 import com.utsman.locationapi.entity.LocationData
+import com.utsman.ojeku.home.repo.HomeRepository
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 

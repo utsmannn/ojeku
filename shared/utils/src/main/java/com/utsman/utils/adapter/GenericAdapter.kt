@@ -188,14 +188,27 @@ class GenericAdapter<T : Equatable>(
         attachedRecyclerView?.smoothScrollToPosition(itemCount)
     }
 
-    fun changeItem(items: List<T>, isRemoveDuplicate: Boolean = true) {
-        if (isRemoveDuplicate) {
-            differ.submitList(items.distinct())
-        } else {
-            differ.submitList(items)
-        }
+    fun pushEmpty() {
+        differ.submitList(listOf(Empty))
+        attachedRecyclerView?.smoothScrollToPosition(itemCount)
+    }
 
-        previousCount = items.size
+    fun changeItem(items: List<T>, isRemoveDuplicate: Boolean = true) {
+        val newItem = calculateMutableItems()
+        if (items.isNotEmpty()) newItem.addAll(items)
+        if (newItem.isEmpty()) newItem.add(Empty)
+        isEndedTemp = false
+
+        val newList = (newItem).run {
+            if (isRemoveDuplicate) {
+                distinct()
+            } else {
+                this
+            }
+        }
+        differ.submitList(newList)
+
+        previousCount += items.size
     }
 
     suspend fun clearItems() {

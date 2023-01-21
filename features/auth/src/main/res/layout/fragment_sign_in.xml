@@ -5,23 +5,36 @@
     android:orientation="vertical"
     android:padding="12dp">
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
     <EditText
         android:id="@+id/ed_username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
-        android:background="@null"
+        android:background="@drawable/bg_rectangle_white"
+        android:padding="12dp"
         android:hint="username"
+        android:inputType="textShortMessage"
         android:textSize="14sp" />
 
     <EditText
         android:id="@+id/ed_password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@null"
+        android:background="@drawable/bg_rectangle_white"
+        android:padding="12dp"
+        android:inputType="textPassword"
         android:hint="password"
         android:textSize="14sp" />
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"/>
 
     <Button
         android:id="@+id/btn_sign_in"

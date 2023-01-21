@@ -10,6 +10,7 @@ interface MainActivityListener : ActivityListener {
     fun sendFromLocation(from: LocationData)
     fun sendDestinationLocation(destination: LocationData)
 
+    fun navigateToMain()
     fun navigateToSearchLocation(formType: Int)
 
     object FormType {

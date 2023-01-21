@@ -23,20 +23,25 @@ class InputLocationView(context: Context, attributeSet: AttributeSet) :
 
     data class InputLocationData(
         val location: Location = Location(""),
-        val name: String = "Select location"
+        val name: String = "Find location"
     ) {
         fun isEmpty(): Boolean = name == "Select location"
     }
 
-    private var _inputLocationFromData: InputLocationData = InputLocationData()
 
     private var isFromEnableTypingDefined = true
     private var isDestinationEnableTypingDefined = true
 
+    private var _inputLocationFromData: InputLocationData = InputLocationData()
     var inputLocationFromData: InputLocationData
         get() = _inputLocationFromData
         set(value) {
             editTextViewFrom.setText(value.name)
+            editTextViewFrom.alpha = if (value.name == "Find location") {
+                0.4f
+            } else {
+                1f
+            }
             editTextViewFrom.clearFocus()
             _inputLocationFromData = value
         }
@@ -46,6 +51,11 @@ class InputLocationView(context: Context, attributeSet: AttributeSet) :
         get() = _inputLocationDestData
         set(value) {
             editTextViewDest.setText(value.name)
+            editTextViewDest.alpha = if (value.name == "Find location") {
+                0.4f
+            } else {
+                1f
+            }
             editTextViewDest.clearFocus()
             _inputLocationDestData = value
         }
@@ -53,8 +63,8 @@ class InputLocationView(context: Context, attributeSet: AttributeSet) :
     init {
         inflate(context, R.layout.component_input_location, this)
 
-        editTextViewFrom.hint = "Select location"
-        editTextViewDest.hint = "Select location"
+        editTextViewFrom.hint = "Find location"
+        editTextViewDest.hint = "Find location"
     }
 
     companion object {

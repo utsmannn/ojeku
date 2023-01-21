@@ -1,17 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="#ffffff">
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tl_auth"
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/appCompatImageView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="230dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/bg_art_ojeku"
+        android:scaleType="centerCrop"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.viewpager.widget.ViewPager
-        android:id="@+id/vp_auth"
+    <androidx.constraintlayout.widget.Guideline
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content"
+        app:layout_constraintGuide_percent="0.2"
+        android:orientation="horizontal"
+        android:id="@+id/gh_1"/>
 
-</LinearLayout>
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="24dp"
+        app:cardBackgroundColor="#F8F8F8"
+        app:cardElevation="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/gh_1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tl_auth"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                app:tabIndicatorColor="@color/green"
+                app:tabIndicatorFullWidth="false"
+                app:tabSelectedTextColor="#000000"
+                app:tabTextAppearance="@style/TabLayoutDisableAllCaps"
+                app:tabTextColor="#BBBBBBDE" />
+
+            <androidx.viewpager.widget.ViewPager
+                android:id="@+id/vp_auth"
+                android:layout_width="match_parent"
+                android:layout_height="220dp" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

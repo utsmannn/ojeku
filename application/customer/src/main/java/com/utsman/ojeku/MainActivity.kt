@@ -10,8 +10,8 @@ import com.utsman.navigation.attachFragment
 import com.utsman.navigation.replaceFragment
 import com.utsman.ojeku.cust.search.SearchLocationFragment
 import com.utsman.ojeku.databinding.ActivityMainBinding
-import com.utsman.ojeku.home.HomeFragment
-import com.utsman.ojeku.home.HomeFragmentListener
+import com.utsman.ojeku.home.fragment.HomeFragment
+import com.utsman.ojeku.home.fragment.HomeFragmentListener
 import com.utsman.ojeku.home.MainActivityListener
 import com.utsman.utils.BindingActivity
 import com.utsman.utils.listener.findFragmentListener
@@ -53,16 +53,12 @@ class MainActivity : BindingActivity<ActivityMainBinding>(), MainActivityListene
     }
 
     override fun onCreateBinding(savedInstanceState: Bundle?) {
-        homeTag = supportFragmentManager.attachFragment(binding.mainFrame, HomeFragment::class)
+        homeTag = supportFragmentManager.replaceFragment(binding.mainFrame, HomeFragment::class)
         MainScope().launch {
             delay(1000)
             getFragmentListener()?.pushLoadingFormLocation()
             getFragmentListener()?.requestLocation()
         }
-    }
-
-    private fun navigateToSearchFragment() {
-        supportFragmentManager.replaceFragment(binding.mainFrame, SearchLocationFragment::class)
     }
 
     override fun onLocationResult(data: Location) {
@@ -82,13 +78,17 @@ class MainActivity : BindingActivity<ActivityMainBinding>(), MainActivityListene
         updateLocationData()
     }
 
+    override fun navigateToMain() {
+        homeTag = supportFragmentManager.replaceFragment(binding.mainFrame, HomeFragment::class)
+    }
+
     override fun navigateToSearchLocation(formType: Int) {
         val bundleForm = bundleOf(
             "formType" to formType,
             "location_from" to fromLocation,
             "location_dest" to destLocation
         )
-        supportFragmentManager.replaceFragment(binding.mainFrame, SearchLocationFragment::class, bundle = bundleForm)
+        supportFragmentManager.replaceFragment(binding.mainFrame, SearchLocationFragment::class, bundle = bundleForm, backstackName = "home")
     }
 
     private fun updateLocationData() {

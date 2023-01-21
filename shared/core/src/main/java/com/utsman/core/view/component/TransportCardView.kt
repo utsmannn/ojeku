@@ -1,11 +1,14 @@
 package com.utsman.core.view.component
 
 import android.content.Context
+import android.graphics.Color
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.cardview.widget.CardView
+import com.google.android.material.card.MaterialCardView
 import com.utsman.core.R
 import com.utsman.core.extensions.findIdByLazy
 
@@ -17,7 +20,7 @@ class TransportCardView(context: Context, attributeSet: AttributeSet) : FrameLay
         TAXI
     }
 
-    private val componentView: View by findIdByLazy(R.id.transport_card_root)
+    private val componentView: MaterialCardView by findIdByLazy(R.id.transport_card_root)
     private val imageView: ImageView by findIdByLazy(R.id.transport_card_img)
     private val titleView: TextView by findIdByLazy(R.id.transport_card_title)
 
@@ -79,13 +82,14 @@ class TransportCardView(context: Context, attributeSet: AttributeSet) : FrameLay
 
     private fun setBackgroundRoot(isSelected: Boolean) {
         _isTransportSelected = isSelected
-        val backgroundRoot = if (isSelected) {
-            R.drawable.bg_transport_card_stroke
+        val strokeColor = if (isSelected) {
+            R.color.green
         } else {
-            R.drawable.bg_transport_card_white
+            Color.WHITE
         }
 
-        componentView.setBackgroundResource(backgroundRoot)
+        componentView.strokeColor = strokeColor
+        componentView.strokeWidth = 3
     }
 
 

@@ -3,7 +3,8 @@
     package="com.utsman.auth">
 
     <application>
-        <activity android:name=".ui.AuthActivity"/>
+        <activity android:name=".ui.AuthActivity"
+            android:windowSoftInputMode="adjustResize"/>
     </application>
 
 </manifest>
