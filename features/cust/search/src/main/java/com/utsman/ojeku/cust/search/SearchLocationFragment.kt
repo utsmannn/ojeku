@@ -1,31 +1,28 @@
 package com.utsman.ojeku.cust.search
 
 import android.os.Bundle
-import android.widget.Toast
+import android.view.View
 import androidx.core.view.isVisible
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.utsman.core.CoroutineBus
 import com.utsman.core.LocationManager
 import com.utsman.core.extensions.*
 import com.utsman.core.state.StateEvent
-import com.utsman.core.state.StateEventSubscriber
 import com.utsman.core.view.component.InputLocationView
+import com.utsman.locationapi.LocationApiLayout
+import com.utsman.locationapi.databinding.ItemSearchLocationBinding
 import com.utsman.locationapi.entity.LocationData
-import com.utsman.navigation.FragmentConnector
-import com.utsman.navigation.ProfileFragmentConnector
-import com.utsman.navigation.replaceFragment
+import com.utsman.locationapi.ui.onBindAdapter
 import com.utsman.ojeku.cust.search.databinding.FragmentSearchBinding
-import com.utsman.ojeku.cust.search.databinding.ItemSearchLocationBinding
 import com.utsman.utils.BindingFragment
 import com.utsman.utils.adapter.genericAdapter
-import com.utsman.utils.snackBar
+import com.utsman.utils.listener.findActivityListener
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
-import kotlin.math.roundToInt
 
 class SearchLocationFragment : BindingFragment<FragmentSearchBinding>() {
 
@@ -48,9 +45,9 @@ class SearchLocationFragment : BindingFragment<FragmentSearchBinding>() {
     }
 
     private val searchAdapter by genericAdapter<LocationData>(
-        layoutRes = R.layout.item_search_location,
+        layoutRes = LocationApiLayout.item_search_location,
         onBindItem = { position, item ->
-            ItemSearchLocationBinding.bind(this).onBindAdapter(position, item)
+            bindAdapter(this, position, item)
         }
     )
 
@@ -62,11 +59,18 @@ class SearchLocationFragment : BindingFragment<FragmentSearchBinding>() {
     }
 
     override fun onCreateBinding(savedInstanceState: Bundle?) {
-        Toast.makeText(context, formType.toString(), Toast.LENGTH_SHORT).show()
         binding.inputSearch.setFocus(formType)
 
-        viewModel.setFromLocationData(fromLocationExtra)
-        viewModel.setDestLocationData(destLocationExtra)
+        when (formType) {
+            1 -> {
+                viewModel.setFromLocationData(LocationData())
+                viewModel.setDestLocationData(destLocationExtra)
+            }
+            2 -> {
+                viewModel.setFromLocationData(fromLocationExtra)
+                viewModel.setDestLocationData(LocationData())
+            }
+        }
 
         viewModel.fromLocationData.observe(this) { locationData ->
             if (locationData.latLng.latitude != 0.0) {
@@ -97,6 +101,14 @@ class SearchLocationFragment : BindingFragment<FragmentSearchBinding>() {
                 hideKeyboard()
                 delay(2000)
                 viewModel.isEnableDestSearch = true
+            }
+        }
+
+        viewModel.filledLocationData.observe(this) { (isFilled, from, dest) ->
+            val locationData = Pair(from, dest)
+            if (isFilled) {
+                CoroutineBus.getInstance().post("location_input_filled", locationData)
+                activity?.onBackPressed()
             }
         }
 
@@ -154,32 +166,24 @@ class SearchLocationFragment : BindingFragment<FragmentSearchBinding>() {
         searchAdapter.pushError(throwable)
     }
 
-    private fun ItemSearchLocationBinding.onBindAdapter(position: Int, item: LocationData) {
-        itemTvName.text = item.name
-        itemTvAddress.text = item.address
-
-        val distance = item.latLng.toLocation().distanceTo(viewModel.currentLocation)
-        val distanceIsMeters = when {
-            distance < 1000.0 -> "~ ${distance.roundToInt()} M"
-            else -> String.format("~ %.2f KM", distance / 1000.0)
-        }
-
-        itemTvDistance.text = distanceIsMeters
-
-        val isLastPosition = position == searchAdapter.itemCount - 1
-        itemDivider.isVisible = !isLastPosition
-
-        root.setOnClickListener {
-            when (viewModel.searchType) {
-                1 -> {
-                    viewModel.setFromLocationData(item)
-                    viewModel.isEnableFromSearch = false
-                }
-                2 -> {
-                    viewModel.setDestLocationData(item)
-                    viewModel.isEnableDestSearch = false
+    private fun bindAdapter(view: View, position: Int, item: LocationData) {
+        ItemSearchLocationBinding.bind(view).onBindAdapter(
+            position = position,
+            item = item,
+            currentLocation = viewModel.currentLocation,
+            itemCount = searchAdapter.itemCount,
+            onClick = { _, _ ->
+                when (viewModel.searchType) {
+                    1 -> {
+                        viewModel.setFromLocationData(item)
+                        viewModel.isEnableFromSearch = false
+                    }
+                    2 -> {
+                        viewModel.setDestLocationData(item)
+                        viewModel.isEnableDestSearch = false
+                    }
                 }
             }
-        }
+        )
     }
 }

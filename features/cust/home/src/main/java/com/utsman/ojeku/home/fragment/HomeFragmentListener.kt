@@ -1,4 +1,4 @@
-package com.utsman.ojeku.home
+package com.utsman.ojeku.home.fragment
 
 import android.location.Location
 import com.utsman.locationapi.entity.LocationData

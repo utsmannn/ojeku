@@ -170,3 +170,9 @@ fun <T> StateEvent<T>.onFailure(action: Throwable.() -> Unit) {
         action.invoke(exception)
     }
 }
+
+fun <T> StateEvent<T>.onEmpty(action: () -> Unit) {
+    if (this is StateEvent.Empty) {
+        action.invoke()
+    }
+}

@@ -14,6 +14,8 @@ import com.utsman.locationapi.Mapper
 import com.utsman.locationapi.StateLocationList
 import com.utsman.locationapi.entity.LocationData
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 
@@ -29,13 +31,21 @@ class SearchLocationViewModel(
     val searchLocationState =
         searchLocationRepository.locationState.asLiveData(searchLocationSafeScope.coroutineContext)
 
-    private val _fromLocationData = MutableLiveData(LocationData())
+    private val _fromLocationData = MutableStateFlow(LocationData())
     val fromLocationData: LiveData<LocationData>
-        get() = _fromLocationData
+        get() = _fromLocationData.asLiveData(viewModelScope.coroutineContext)
 
-    private val _destLocationData = MutableLiveData(LocationData())
+    private val _destLocationData = MutableStateFlow(LocationData())
     val destLocationData: LiveData<LocationData>
-        get() = _destLocationData
+        get() = _destLocationData.asLiveData(viewModelScope.coroutineContext)
+
+    val filledLocationData: LiveData<Triple<Boolean, LocationData, LocationData>>
+        get() {
+            return _fromLocationData.combine(_destLocationData) { from, dest ->
+                val isFilled = from.name.isNotEmpty() && dest.name.isNotEmpty()
+                Triple(isFilled, from, dest)
+            }.asLiveData(viewModelScope.coroutineContext)
+        }
 
     var searchType: Int = 1
     var isEnableFromSearch = true

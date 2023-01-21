@@ -1,4 +1,4 @@
-package com.utsman.ojeku.home
+package com.utsman.ojeku.home.repo
 
 import android.location.Location
 import com.utsman.core.state.MutableStateEventManager
@@ -11,10 +11,8 @@ import com.utsman.core.state.StateEvent
 import com.utsman.locationapi.LocationWebServices
 import com.utsman.locationapi.Mapper
 import com.utsman.locationapi.entity.LocationData
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 
 class HomeRepositoryImpl(
     private val locationManager: LocationManager,
