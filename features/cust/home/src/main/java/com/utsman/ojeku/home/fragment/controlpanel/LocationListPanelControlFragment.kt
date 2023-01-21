@@ -1,6 +1,5 @@
 package com.utsman.ojeku.home.fragment.controlpanel
 
-import android.location.Location
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
@@ -9,7 +8,6 @@ import com.utsman.core.LocationManager
 import com.utsman.core.extensions.onEmpty
 import com.utsman.core.extensions.onFailure
 import com.utsman.core.extensions.onSuccess
-import com.utsman.core.extensions.toLatLng
 import com.utsman.core.state.StateEvent
 import com.utsman.locationapi.LocationApiLayout
 import com.utsman.locationapi.databinding.ItemSearchLocationBinding
@@ -18,6 +16,7 @@ import com.utsman.locationapi.ui.onBindAdapter
 import com.utsman.ojeku.home.databinding.FragmentPanelControlLocationListBinding
 import com.utsman.utils.BindingFragment
 import com.utsman.utils.adapter.genericAdapter
+import com.utsman.utils.snackBar
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class LocationListPanelControlFragment :
@@ -65,7 +64,7 @@ class LocationListPanelControlFragment :
                 currentLocation = location,
                 itemCount = locationAdapter.itemCount,
                 onClick = { _, _ ->
-
+                    viewModel.setLocationDest(item)
                 },
                 onToggleClick = {
 

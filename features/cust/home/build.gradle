@@ -25,4 +25,5 @@ dependencies {
     implementation project(":shared:navigation")
     
     implementation project(":features:location-api")
+    implementation project(":features:booking-api")
 }

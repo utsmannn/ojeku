@@ -13,7 +13,8 @@ import com.google.android.material.card.MaterialCardView
 import com.utsman.core.R
 import com.utsman.core.extensions.findIdByLazy
 
-class TransportCardView(context: Context, attributeSet: AttributeSet) : FrameLayout(context, attributeSet) {
+class TransportCardView(context: Context, attributeSet: AttributeSet) :
+    FrameLayout(context, attributeSet) {
 
     enum class Type {
         BIKE,
@@ -54,6 +55,20 @@ class TransportCardView(context: Context, attributeSet: AttributeSet) : FrameLay
             setComponentType(value)
         }
 
+    val name: String
+        get() = when (_type) {
+            Type.BIKE -> "Bike"
+            Type.CAR -> "Car"
+            Type.TAXI -> "Taxi"
+        }
+
+    val description: String
+        get() = when (_type) {
+            Type.BIKE -> "1 Penumpang"
+            Type.CAR -> "2 - 5 Penumpang"
+            Type.TAXI -> "2 - 5 Penumpang (mode hemat)"
+        }
+
     init {
         inflate(context, R.layout.component_transport_card, this)
         context.obtainStyledAttributes(
@@ -92,7 +107,6 @@ class TransportCardView(context: Context, attributeSet: AttributeSet) : FrameLay
         componentView.strokeColor = ContextCompat.getColor(context, strokeColor)
         componentView.strokeWidth = 5
     }
-
 
     private fun setComponentType(type: Type) {
         _type = type

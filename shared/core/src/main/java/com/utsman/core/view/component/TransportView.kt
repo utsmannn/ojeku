@@ -19,7 +19,6 @@ class TransportView(context: Context, attributeSet: AttributeSet) :
 
     private val rvTransport: RecyclerView by findIdByLazy(R.id.rv_transport)
 
-    private var currentPosition: Int = -1
 
     init {
         inflate(context, R.layout.component_transport_view, this)
@@ -28,6 +27,9 @@ class TransportView(context: Context, attributeSet: AttributeSet) :
         rvTransport.layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
         rvTransport.adapter = transportAdapter
     }
+
+    var currentPosition: Int = -1
+    var onSelected: (TransportCardView) -> Unit = {}
 
     private inner class RvAdapterViewHolder(view: View) : ViewHolder(view)
 
@@ -56,11 +58,17 @@ class TransportView(context: Context, attributeSet: AttributeSet) :
 
             transportCard.isTransportSelected = position == currentPosition
 
+            if (position == currentPosition) {
+                onSelected.invoke(transportCard)
+            }
+
             transportCard.setOnClickListener {
                 val savedPosition = position
                 if (currentPosition != position) {
                     currentPosition = savedPosition
                     notifyDataSetChanged()
+
+                    onSelected.invoke(transportCard)
                 }
             }
         }

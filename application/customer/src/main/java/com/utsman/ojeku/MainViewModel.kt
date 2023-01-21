@@ -17,9 +17,14 @@ class MainViewModel(
     }
 
     val userState = profileRepository.userState.asLiveData(profileSafeScope.coroutineContext)
+    val fcmUpdateState = profileRepository.fcmUpdateState.asLiveData(profileSafeScope.coroutineContext)
 
     fun getCurrentUser() = profileSafeScope.launch {
         profileRepository.getUser()
+    }
+
+    fun updateFcmToken(fcmToken: String) = profileSafeScope.launch {
+        profileRepository.updateFcmToken(fcmToken)
     }
 
 }

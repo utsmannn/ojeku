@@ -3,7 +3,9 @@ package com.utsman.ojeku
 import android.location.Location
 import android.os.Bundle
 import androidx.core.os.bundleOf
+import com.google.firebase.messaging.FirebaseMessaging
 import com.utsman.core.extensions.onFailure
+import com.utsman.core.extensions.onSuccess
 import com.utsman.locationapi.entity.LocationData
 import com.utsman.navigation.activityNavigationCust
 import com.utsman.navigation.attachFragment
@@ -35,7 +37,7 @@ class MainActivity : BindingActivity<ActivityMainBinding>(), MainActivityListene
     private val mainViewModel: MainViewModel by viewModel()
 
     private fun getFragmentListener(): HomeFragmentListener? {
-        return findFragmentListener(homeTag)
+        return supportFragmentManager.findFragmentListener(homeTag)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,6 +51,20 @@ class MainActivity : BindingActivity<ActivityMainBinding>(), MainActivityListene
                 activityNavigationCust().authActivity(this@MainActivity)
                 finish()
             }
+        }
+
+        mainViewModel.fcmUpdateState.observe(this) { state ->
+            state.onSuccess {
+                println("fcm updated...")
+            }
+
+            state.onFailure {
+                this.printStackTrace()
+            }
+        }
+
+        MainUtils.getFcmToken {
+            mainViewModel.updateFcmToken(it)
         }
     }
 

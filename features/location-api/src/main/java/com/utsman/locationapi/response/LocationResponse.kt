@@ -24,7 +24,7 @@ data class LocationResponse(
             val city: String?,
             @SerializedName("country")
             val country: String?,
-            @SerializedName("distric")
+            @SerializedName("district")
             val distric: String?
         )
 
