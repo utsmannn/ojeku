@@ -64,6 +64,10 @@ class SearchLocationViewModel(
         _destLocationData.value = locationData
     }
 
+    fun toggleSaveLocation(locationData: LocationData) = viewModelScope.launch {
+        searchLocationRepository.toggleSaveLocation(locationData)
+    }
+
     fun getLocations(name: String, location: Location) = searchLocationSafeScope.launch {
         val coordinate = "${location.latitude},${location.longitude}"
         searchLocationRepository.searchLocation(name, coordinate)

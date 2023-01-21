@@ -10,7 +10,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 object HomeModule {
     fun module() = org.koin.dsl.module {
         factory<HomeRepository> { HomeRepositoryImpl(get(), get()) }
-        factory { LocationListRepository.build() }
+        factory { LocationListRepository.build(get()) }
 
         viewModel { HomeViewModel(get()) }
         viewModel { LocationListPanelControlViewModel(get(), get()) }

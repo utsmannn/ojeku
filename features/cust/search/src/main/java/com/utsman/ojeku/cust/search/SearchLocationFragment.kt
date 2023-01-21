@@ -20,6 +20,7 @@ import com.utsman.ojeku.cust.search.databinding.FragmentSearchBinding
 import com.utsman.utils.BindingFragment
 import com.utsman.utils.adapter.genericAdapter
 import com.utsman.utils.listener.findActivityListener
+import com.utsman.utils.snackBar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -146,6 +147,7 @@ class SearchLocationFragment : BindingFragment<FragmentSearchBinding>() {
                 renderLoading()
             }
             state.onFailure {
+                this.printStackTrace()
                 renderFailure(this)
             }
             state.onSuccess {
@@ -183,6 +185,13 @@ class SearchLocationFragment : BindingFragment<FragmentSearchBinding>() {
                         viewModel.isEnableDestSearch = false
                     }
                 }
+            },
+            onToggleClick = {
+                viewModel.toggleSaveLocation(item)
+                searchAdapter.notifyItemChanged(position)
+            },
+            onBind = {
+
             }
         )
     }

@@ -194,7 +194,7 @@ class GenericAdapter<T : Equatable>(
     }
 
     fun changeItem(items: List<T>, isRemoveDuplicate: Boolean = true) {
-        val newItem = calculateMutableItems()
+        val newItem = calculateMutableItems(emptyList())
         if (items.isNotEmpty()) newItem.addAll(items)
         if (newItem.isEmpty()) newItem.add(Empty)
         isEndedTemp = false

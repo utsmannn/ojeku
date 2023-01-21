@@ -1,5 +1,6 @@
 package com.utsman.ojeku.home.fragment.controlpanel
 
+import android.location.Location
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
@@ -14,8 +15,15 @@ class LocationListPanelControlViewModel(
     private val locationManager: LocationManager
 ) : ViewModel() {
 
+    private var _currentLocation: Location = Location("")
     val currentLocation
-        get() = runBlocking { locationManager.getLocationFlow().first() }
+        get() = _currentLocation
+
+    init {
+        locationManager.getLastLocation {
+            _currentLocation = it
+        }
+    }
 
     val locationListState
         get() = locationListRepository.locationListState.asLiveData(viewModelScope.coroutineContext)

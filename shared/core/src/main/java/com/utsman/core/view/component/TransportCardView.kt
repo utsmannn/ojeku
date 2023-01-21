@@ -8,6 +8,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
 import com.google.android.material.card.MaterialCardView
 import com.utsman.core.R
 import com.utsman.core.extensions.findIdByLazy
@@ -85,11 +86,11 @@ class TransportCardView(context: Context, attributeSet: AttributeSet) : FrameLay
         val strokeColor = if (isSelected) {
             R.color.green
         } else {
-            Color.WHITE
+            R.color.white
         }
 
-        componentView.strokeColor = strokeColor
-        componentView.strokeWidth = 3
+        componentView.strokeColor = ContextCompat.getColor(context, strokeColor)
+        componentView.strokeWidth = 5
     }
 
 

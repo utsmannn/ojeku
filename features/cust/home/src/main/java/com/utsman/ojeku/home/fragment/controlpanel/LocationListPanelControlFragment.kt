@@ -5,9 +5,11 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.utsman.core.LocationManager
 import com.utsman.core.extensions.onEmpty
 import com.utsman.core.extensions.onFailure
 import com.utsman.core.extensions.onSuccess
+import com.utsman.core.extensions.toLatLng
 import com.utsman.core.state.StateEvent
 import com.utsman.locationapi.LocationApiLayout
 import com.utsman.locationapi.databinding.ItemSearchLocationBinding
@@ -56,14 +58,19 @@ class LocationListPanelControlFragment :
     }
 
     private fun bindAdapter(view: View, position: Int, item: LocationData) {
-        ItemSearchLocationBinding.bind(view).onBindAdapter(
-            position = position,
-            item = item,
-            currentLocation = Location(""),
-            itemCount = locationAdapter.itemCount,
-            onClick = { _, _ ->
+        LocationManager.instance.getLastLocation { location ->
+            ItemSearchLocationBinding.bind(view).onBindAdapter(
+                position = position,
+                item = item,
+                currentLocation = location,
+                itemCount = locationAdapter.itemCount,
+                onClick = { _, _ ->
 
-            }
-        )
+                },
+                onToggleClick = {
+
+                }
+            )
+        }
     }
 }

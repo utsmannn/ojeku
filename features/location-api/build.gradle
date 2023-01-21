@@ -2,6 +2,7 @@ plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-parcelize'
+    id 'kotlin-kapt'
 }
 
 apply from: "$rootDir/gradle/script/main.gradle"
@@ -22,4 +23,8 @@ dependencies {
     implementation project(":shared:network")
     implementation project(":shared:core")
     implementation project(":shared:utils")
+
+    implementation 'androidx.room:room-runtime:2.4.3'
+    implementation 'androidx.room:room-ktx:2.4.3'
+    kapt 'androidx.room:room-compiler:2.4.3'
 }

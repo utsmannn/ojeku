@@ -8,7 +8,7 @@ object CustomerSearchModule {
 
     fun modules() = module {
         single { LocationWebServices.build() }
-        factory { SearchLocationRepository.build(get()) }
+        factory { SearchLocationRepository.build(get(), get()) }
         viewModel { SearchLocationViewModel(get()) }
     }
 }
