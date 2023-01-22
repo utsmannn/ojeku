@@ -21,4 +21,6 @@ dependencies {
     implementation project(":shared:core")
     implementation project(":shared:utils")
     implementation project(":shared:navigation")
+
+    implementation project(":features:profile-api")
 }

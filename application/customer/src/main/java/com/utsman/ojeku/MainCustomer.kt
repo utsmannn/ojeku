@@ -1,9 +1,8 @@
 package com.utsman.ojeku
 
 import android.app.Application
-import com.google.firebase.messaging.FirebaseMessaging
+import com.ojeku.profile.di.ProfileModule
 import com.utsman.koin.KoinStarter
-import com.utsman.locationapi.LocationApiModule
 import com.utsman.ojeku.booking.BookingModule
 import com.utsman.ojeku.home.di.HomeModule
 
@@ -14,7 +13,8 @@ class MainCustomer : Application() {
         KoinStarter.onCreate(this, listOf(
             HomeModule.module(),
             MainModule.modules(),
-            BookingModule.modules()
+            BookingModule.modules(),
+            ProfileModule.modules()
         ))
 
         MainUtils.getFcmToken { token ->

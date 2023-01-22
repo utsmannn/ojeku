@@ -1,6 +1,7 @@
 package com.utsman.auth.ui
 
 import android.os.Bundle
+import androidx.core.os.bundleOf
 import com.utsman.auth.databinding.ActivityAuthBinding
 import com.utsman.utils.BindingActivity
 import com.utsman.utils.ViewPagerPage
@@ -18,9 +19,11 @@ class AuthActivity : BindingActivity<ActivityAuthBinding>() {
     override fun onCreateBinding(savedInstanceState: Bundle?) {
         binding.vpAuth.setup(
             fragmentManager = supportFragmentManager,
-            ViewPagerPage("Sign In", SignInFragment()),
+            ViewPagerPage("Sign In", SignInFragment().apply {
+                arguments = bundleOf("type" to type)
+            }),
             ViewPagerPage("Sign Up", SignUpFragment().apply {
-                arguments?.putString("type", type)
+                arguments = bundleOf("type" to type)
             })
         )
 

@@ -20,8 +20,13 @@ fun Context.intentTo(clazz: KClass<*>, onIntent: (Intent) -> Unit = {}) {
 
 private object Navigation : KoinComponent {
     val activityNavigatorCustomer: ActivityNavigatorCustomer by inject()
+    val activityNavigatorDriver: ActivityNavigatorDriver by inject()
 }
 
 fun activityNavigationCust(): ActivityNavigatorCustomer {
     return Navigation.activityNavigatorCustomer
+}
+
+fun activityNavigationDriver(): ActivityNavigatorDriver {
+    return Navigation.activityNavigatorDriver
 }

@@ -88,6 +88,7 @@ fun <T, U> Response<T>.reducer(mapper: (T) -> U): StateEvent<U> {
                 StateEvent.Failure(e)
             } catch (e: Throwable) {
                 println("OJEKUUU======== network failure")
+                e.printStackTrace()
                 StateEvent.Failure(e)
             }
 

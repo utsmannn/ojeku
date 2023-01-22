@@ -1,4 +1,7 @@
-package com.utsman.profile
+package com.ojeku.profile
+
+import com.ojeku.profile.entity.User
+import com.ojeku.profile.entity.UserResponse
 
 object ProfileMapper {
 
@@ -7,7 +10,8 @@ object ProfileMapper {
             id = response?.data?.id.orEmpty(),
             username = response?.data?.username.orEmpty(),
             role = response?.data?.role.orEmpty(),
-            fcmToken = response?.data?.fcmToken.orEmpty()
+            fcmToken = response?.data?.fcmToken.orEmpty(),
+            userExtra = response?.data?.extra as Any
         )
     }
 }

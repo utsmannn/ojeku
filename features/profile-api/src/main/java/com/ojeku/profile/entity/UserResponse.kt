@@ -1,4 +1,4 @@
-package com.utsman.profile
+package com.ojeku.profile.entity
 
 
 import com.google.gson.annotations.SerializedName
@@ -21,8 +21,6 @@ data class UserResponse(
         @SerializedName("fcm_token")
         var fcmToken: String? = null,
         @SerializedName("extra")
-        var extra: ExtraResponse? = null
-    ) {
-        class ExtraResponse
-    }
+        var extra: Any? = null
+    )
 }

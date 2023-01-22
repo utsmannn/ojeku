@@ -23,6 +23,7 @@
             <option value="$PROJECT_DIR$/features/driver" />
             <option value="$PROJECT_DIR$/features/driver/home" />
             <option value="$PROJECT_DIR$/features/location-api" />
+            <option value="$PROJECT_DIR$/features/profile-api" />
             <option value="$PROJECT_DIR$/shared" />
             <option value="$PROJECT_DIR$/shared/core" />
             <option value="$PROJECT_DIR$/shared/koin" />

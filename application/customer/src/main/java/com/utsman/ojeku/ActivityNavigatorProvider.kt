@@ -18,12 +18,6 @@ class ActivityNavigatorProvider : ActivityNavigatorCustomer {
         }
     }
 
-    override fun authActivityDriver(context: Context?) {
-        context?.intentTo(AuthActivity::class) {
-            it.putExtra("type", "driver")
-        }
-    }
-
     override fun searchLocationActivity(context: Context?, onIntent: (Intent) -> Unit) {
         context?.intentTo(SearchLocationActivity::class, onIntent)
     }

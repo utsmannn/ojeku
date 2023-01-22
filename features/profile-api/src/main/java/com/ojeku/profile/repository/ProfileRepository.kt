@@ -1,5 +1,10 @@
-package com.utsman.profile
+package com.ojeku.profile.repository
 
+import android.location.Location
+import com.ojeku.profile.ProfileMapper
+import com.ojeku.profile.services.ProfileWebServices
+import com.ojeku.profile.entity.UpdateFcmRequest
+import com.ojeku.profile.entity.User
 import com.utsman.core.RepositoryProvider
 import com.utsman.core.state.StateEvent
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,14 +16,19 @@ interface ProfileRepository {
 
     suspend fun getUser()
     suspend fun updateFcmToken(fcmToken: String)
+    suspend fun updateDriverActive(isActive: Boolean)
+    suspend fun updateUserLocation(location: Location)
 
-    private class Impl(private val webServices: ProfileWebServices) : ProfileRepository, RepositoryProvider() {
+    private class Impl(private val webServices: ProfileWebServices) : ProfileRepository,
+        RepositoryProvider() {
 
-        private val _userState: MutableStateFlow<StateEvent<User>> = MutableStateFlow(StateEvent.Idle())
+        private val _userState: MutableStateFlow<StateEvent<User>> =
+            MutableStateFlow(StateEvent.Idle())
         override val userState: StateFlow<StateEvent<User>>
             get() = _userState
 
-        private val _updateFcmToken: MutableStateFlow<StateEvent<Boolean>> = MutableStateFlow(StateEvent.Idle())
+        private val _updateFcmToken: MutableStateFlow<StateEvent<Boolean>> =
+            MutableStateFlow(StateEvent.Idle())
         override val fcmUpdateState: StateFlow<StateEvent<Boolean>>
             get() = _updateFcmToken
 
@@ -45,10 +55,26 @@ interface ProfileRepository {
                 }
             )
         }
+
+        override suspend fun updateDriverActive(isActive: Boolean) {
+            bindToState(
+                stateFlow = _userState,
+                onFetch = {
+                    webServices.updateDriverActive(isActive)
+                },
+                mapper = {
+                    ProfileMapper.mapResponseToUser(it)
+                }
+            )
+        }
+
+        override suspend fun updateUserLocation(location: Location) {
+            webServices.updateUserLocation("${location.latitude},${location.longitude}")
+        }
     }
 
     companion object {
-        fun build(webServices: ProfileWebServices) : ProfileRepository {
+        fun build(webServices: ProfileWebServices): ProfileRepository {
             return Impl(webServices)
         }
     }

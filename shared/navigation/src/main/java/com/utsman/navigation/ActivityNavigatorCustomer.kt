@@ -7,6 +7,5 @@ interface ActivityNavigatorCustomer {
 
     fun mainActivity(context: Context?)
     fun authActivityCustomer(context: Context?)
-    fun authActivityDriver(context: Context?)
     fun searchLocationActivity(context: Context?, onIntent: (Intent) -> Unit)
 }

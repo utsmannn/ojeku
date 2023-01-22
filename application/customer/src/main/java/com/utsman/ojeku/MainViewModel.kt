@@ -3,7 +3,7 @@ package com.utsman.ojeku
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.utsman.profile.ProfileRepository
+import com.ojeku.profile.repository.ProfileRepository
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus

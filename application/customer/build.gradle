@@ -31,6 +31,7 @@ dependencies {
     implementation project(":features:auth")
     implementation project(":features:location-api")
     implementation project(":features:booking-api")
+    implementation project(":features:profile-api")
 
     implementation project(":features:cust:home")
     implementation project(":features:cust:search")
