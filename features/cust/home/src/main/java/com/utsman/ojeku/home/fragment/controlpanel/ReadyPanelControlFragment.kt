@@ -2,6 +2,8 @@ package com.utsman.ojeku.home.fragment.controlpanel
 
 import android.os.Bundle
 import com.utsman.core.extensions.onSuccess
+import com.utsman.core.view.component.TransportCardView
+import com.utsman.ojeku.booking.Booking
 import com.utsman.ojeku.booking.rp
 import com.utsman.ojeku.home.databinding.FragmentPanelControlReadyBinding
 import com.utsman.utils.BindingFragment
@@ -20,6 +22,12 @@ class ReadyPanelControlFragment : BindingFragment<FragmentPanelControlReadyBindi
         binding.transportView.onSelected = { transportCardView ->
             binding.tvTextTransport.text = transportCardView.name
             binding.tvTextTransportDescription.text = transportCardView.description
+
+            viewModel.transType = when (transportCardView.type) {
+                TransportCardView.Type.BIKE -> Booking.TransType.BIKE
+                TransportCardView.Type.CAR, TransportCardView.Type.TAXI -> Booking.TransType.CAR
+            }
+
         }
 
         viewModel.bookingState.observe(this) {

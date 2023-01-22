@@ -46,6 +46,9 @@ object BookingMapper {
             price = data?.price ?: 0.0,
             status = Booking.BookingStatus.valueOf(
                 data?.status ?: Booking.BookingStatus.UNDEFINE.name
+            ),
+            transType = Booking.TransType.valueOf(
+                data?.transType ?: Booking.TransType.BIKE.name
             )
         )
     }

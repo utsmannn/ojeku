@@ -6,7 +6,8 @@ data class Booking(
     var driverId: String = "",
     var routeLocation: RouteLocation = RouteLocation(),
     var price: Double = 0.0,
-    var status: BookingStatus = BookingStatus.READY
+    var status: BookingStatus = BookingStatus.READY,
+    var transType: TransType = TransType.BIKE
 ) {
 
     data class RouteLocation(
@@ -17,6 +18,10 @@ data class Booking(
 
     enum class BookingStatus {
         READY, REQUEST, ACCEPTED, CANCELED, ONGOING, DONE, UNDEFINE
+    }
+
+    enum class TransType {
+        BIKE, CAR
     }
 
     data class LocationAddress(

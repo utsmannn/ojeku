@@ -19,7 +19,7 @@ interface BookingRepository {
         status: Booking.BookingStatus
     )
 
-    suspend fun requestBookingCustomer(bookingId: String)
+    suspend fun requestBookingCustomer(bookingId: String, transType: Booking.TransType)
     suspend fun cancelBookingCustomer(bookingId: String)
 
     suspend fun restartStateBookingCustomer()
@@ -69,11 +69,14 @@ interface BookingRepository {
             )
         }
 
-        override suspend fun requestBookingCustomer(bookingId: String) {
+        override suspend fun requestBookingCustomer(
+            bookingId: String,
+            transType: Booking.TransType
+        ) {
             bindToState(
                 stateFlow = _bookingCustomer,
                 onFetch = {
-                    webServices.requestBookingCustomer(bookingId)
+                    webServices.requestBookingCustomer(bookingId, transType)
                 },
                 mapper = {
                     BookingMapper.mapResponseToBooking(it)

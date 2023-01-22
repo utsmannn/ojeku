@@ -24,7 +24,8 @@ interface BookingWebServices {
 
     @POST("/api/booking/request")
     suspend fun requestBookingCustomer(
-        @Query("booking_id") bookingId: String
+        @Query("booking_id") bookingId: String,
+        @Query("trans_type") transType: Booking.TransType
     ): Response<BookingResponse>
 
     @POST("/api/booking/cancel")

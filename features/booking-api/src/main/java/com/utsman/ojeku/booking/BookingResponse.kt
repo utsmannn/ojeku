@@ -23,7 +23,9 @@ data class BookingResponse(
         @SerializedName("price")
         var price: Double? = null,
         @SerializedName("status")
-        var status: String? = null
+        var status: String? = null,
+        @SerializedName("trans_type")
+        var transType: String? = null
     ) {
         data class RouteLocationResponse(
             @SerializedName("from")
