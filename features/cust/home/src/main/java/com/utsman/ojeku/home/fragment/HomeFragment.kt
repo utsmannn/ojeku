@@ -25,6 +25,7 @@ import com.utsman.geolib.polyline.data.StackAnimationMode
 import com.utsman.geolib.polyline.polyline.PolylineAnimator
 import com.utsman.geolib.polyline.utils.createPolylineAnimatorBuilder
 import com.utsman.locationapi.entity.LocationData
+import com.utsman.navigation.activityNavigationCust
 import com.utsman.navigation.replaceFragment
 import com.utsman.ojeku.booking.Booking
 import com.utsman.ojeku.booking.BookingDrawable
@@ -46,7 +47,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import pub.devrel.easypermissions.AfterPermissionGranted
 
-class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomeFragmentListener,
+class HomeFragment : BindingFragment<FragmentHomeBinding>(), /*HomeFragmentListener,*/
     HomePanelFragmentNavigatorListener {
 
     companion object {
@@ -60,6 +61,9 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomeFragmentListene
 
     private lateinit var animatorBuilder: PolylineAnimatorBuilder
     private lateinit var polylineAnimator: PolylineAnimator
+
+    private var fromLocation: LocationData = LocationData()
+    private var destLocation: LocationData = LocationData()
 
     private val locationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -90,11 +94,6 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomeFragmentListene
         return FragmentHomeBinding.inflate(layoutInflater)
     }
 
-    override fun onStart() {
-        super.onStart()
-        viewModel.subscribeLocation(locationSubscriber())
-    }
-
     private fun getActivityListener(): MainActivityListener? {
         return findActivityListener()
     }
@@ -105,6 +104,12 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomeFragmentListene
         mapFragment.getMapAsync {
             map = it
             map.uiSettings.isZoomControlsEnabled = true
+
+            getLocationWithPermission()
+            viewModel.subscribeLocation(locationSubscriber())
+
+            binding.inputCardView.inputLocationFromData = InputLocationView.locationDataLoading()
+            binding.inputCardView.inputLocationDestData = InputLocationView.locationDataLoading()
 
             animatorBuilder = map.createPolylineAnimatorBuilder(
                 primaryColor = ContextCompat.getColor(requireContext(), com.utsman.core.R.color.green),
@@ -127,20 +132,27 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomeFragmentListene
         subscribeThrowable()
 
         binding.inputCardView.onFromClick {
-            getActivityListener()?.navigateToSearchLocation(MainActivityListener.FormType.FROM)
+            //getActivityListener()?.navigateToSearchLocation(MainActivityListener.FormType.FROM)
+            activityNavigationCust().searchLocationActivity(context) {
+                it.putExtra("formType", 1)
+                it.putExtra("location_from", fromLocation)
+                it.putExtra("location_dest", destLocation)
+            }
         }
 
         binding.inputCardView.onDestClick {
-            getActivityListener()?.navigateToSearchLocation(MainActivityListener.FormType.DEST)
+            activityNavigationCust().searchLocationActivity(context) {
+                it.putExtra("formType", 2)
+                it.putExtra("location_from", fromLocation)
+                it.putExtra("location_dest", destLocation)
+            }
         }
 
         CoroutineBus.getInstance()
             .getLiveData<Pair<LocationData, LocationData>>("location_input_filled", lifecycleScope)
             .observe(this) { (from, dest) ->
-                lifecycleScope.launch {
-                    getActivityListener()?.sendFromLocation(from)
-                    getActivityListener()?.sendDestinationLocation(dest)
-                }
+                viewModel.setLocationFrom(from)
+                viewModel.setLocationDest(dest)
             }
 
         viewModel.filledLocationState.observe(this) { (isFilled, from, dest) ->
@@ -189,7 +201,6 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomeFragmentListene
             }
             it.onFailure {
                 if (message.orEmpty().lowercase().contains("exist")) {
-                    //binding.snackBar("$message, get current booking...")
                     viewModel.getCurrentReadyBooking()
                 } else {
                     binding.snackBar(message)
@@ -228,7 +239,7 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomeFragmentListene
             val cameraUpdate = CameraUpdateFactory.newLatLngZoom(data.toLatLng(), 14f)
             map.animateCamera(cameraUpdate)
 
-            getActivityListener()?.onLocationResult(data)
+            viewModel.getInitialLocation(data)
         }
 
         override fun onEmpty() {
@@ -247,6 +258,7 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomeFragmentListene
                 )
 
                 binding.inputCardView.inputLocationFromData = locationData
+                fromLocation = this
             }
         }
     }
@@ -262,6 +274,7 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomeFragmentListene
                 )
 
                 binding.inputCardView.inputLocationDestData = locationData
+                destLocation = this
             }
         }
     }
@@ -269,7 +282,8 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomeFragmentListene
     private fun subscribeInitialLocation() {
         viewModel.initialLocation.observe(this) {
             it.onSuccess {
-                getActivityListener()?.sendFromLocation(this)
+                viewModel.setLocationFrom(this)
+                viewModel.setLocationDest(LocationData())
             }
         }
     }
@@ -313,32 +327,6 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomeFragmentListene
                 stackAnimationMode = StackAnimationMode.WaitStackEndAnimation
             }
         }
-    }
-
-    private fun actionFromActivity(message: String) {
-        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-    }
-
-    override fun onMessageFromActivity(message: String) {
-        actionFromActivity(message)
-    }
-
-    override fun requestLocation() {
-        getLocationWithPermission()
-    }
-
-    override fun onDataLocation(from: LocationData, destination: LocationData) {
-        viewModel.setLocationFrom(from)
-        viewModel.setLocationDest(destination)
-    }
-
-    override fun pushLoadingFormLocation() {
-        binding.inputCardView.inputLocationFromData = InputLocationView.locationDataLoading()
-        binding.inputCardView.inputLocationDestData = InputLocationView.locationDataLoading()
-    }
-
-    override fun requestInitialData(location: Location) {
-        viewModel.getInitialLocation(location)
     }
 
     override fun navigateToLoading() {

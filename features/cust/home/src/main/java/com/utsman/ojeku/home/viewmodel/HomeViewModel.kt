@@ -44,7 +44,6 @@ class HomeViewModel(
 
     val throwableHandler = _throwable.asLiveData(safeScope.coroutineContext)
 
-
     val bookingState = bookingRepository.bookingCustomer.asLiveData(viewModelScope.coroutineContext)
 
     val filledLocationState: LiveData<Triple<Boolean, LocationData, LocationData>>

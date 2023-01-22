@@ -20,23 +20,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class MainActivity : BindingActivity<ActivityMainBinding>(), MainActivityListener {
+class MainActivity : BindingActivity<ActivityMainBinding>() {
     override fun inflateBinding(): ActivityMainBinding {
         return ActivityMainBinding.inflate(layoutInflater)
     }
 
     private lateinit var homeTag: String
 
-    private var fromLocation: LocationData = LocationData()
-    private var destLocation: LocationData = LocationData()
-
-    private var currentLocation: Location? = null
-
     private val mainViewModel: MainViewModel by viewModel()
-
-    private fun getFragmentListener(): HomeFragmentListener? {
-        return supportFragmentManager.findFragmentListener(homeTag)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,44 +62,5 @@ class MainActivity : BindingActivity<ActivityMainBinding>(), MainActivityListene
 
     override fun onCreateBinding(savedInstanceState: Bundle?) {
         homeTag = supportFragmentManager.replaceFragment(binding.mainFrame, HomeFragment::class)
-        MainScope().launch {
-            delay(1000)
-            getFragmentListener()?.pushLoadingFormLocation()
-            getFragmentListener()?.requestLocation()
-        }
-    }
-
-    override fun onLocationResult(data: Location) {
-        if (currentLocation != data) {
-            currentLocation = data
-            getFragmentListener()?.requestInitialData(data)
-        }
-    }
-
-    override fun sendFromLocation(from: LocationData) {
-        fromLocation = from
-        updateLocationData()
-    }
-
-    override fun sendDestinationLocation(destination: LocationData) {
-        destLocation = destination
-        updateLocationData()
-    }
-
-    override fun navigateToMain() {
-        homeTag = supportFragmentManager.replaceFragment(binding.mainFrame, HomeFragment::class)
-    }
-
-    override fun navigateToSearchLocation(formType: Int) {
-        val bundleForm = bundleOf(
-            "formType" to formType,
-            "location_from" to fromLocation,
-            "location_dest" to destLocation
-        )
-        supportFragmentManager.replaceFragment(binding.mainFrame, SearchLocationFragment::class, bundle = bundleForm, backstackName = "home")
-    }
-
-    private fun updateLocationData() {
-        getFragmentListener()?.onDataLocation(fromLocation, destLocation)
     }
 }
