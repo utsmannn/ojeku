@@ -5,5 +5,6 @@ import android.content.Context
 interface ActivityNavigatorCustomer {
 
     fun mainActivity(context: Context?)
-    fun authActivity(context: Context?)
+    fun authActivityCustomer(context: Context?)
+    fun authActivityDriver(context: Context?)
 }

@@ -3,12 +3,10 @@ package com.utsman.ojeku
 import android.location.Location
 import android.os.Bundle
 import androidx.core.os.bundleOf
-import com.google.firebase.messaging.FirebaseMessaging
 import com.utsman.core.extensions.onFailure
 import com.utsman.core.extensions.onSuccess
 import com.utsman.locationapi.entity.LocationData
 import com.utsman.navigation.activityNavigationCust
-import com.utsman.navigation.attachFragment
 import com.utsman.navigation.replaceFragment
 import com.utsman.ojeku.cust.search.SearchLocationFragment
 import com.utsman.ojeku.databinding.ActivityMainBinding
@@ -44,12 +42,15 @@ class MainActivity : BindingActivity<ActivityMainBinding>(), MainActivityListene
         super.onCreate(savedInstanceState)
         mainViewModel.getCurrentUser()
         mainViewModel.userState.observe(this) { state ->
-            println("OJEKU =======")
-            println(state)
-            println("OJEKU =======")
             state.onFailure {
-                activityNavigationCust().authActivity(this@MainActivity)
+                activityNavigationCust().authActivityCustomer(this@MainActivity)
                 finish()
+            }
+            state.onSuccess {
+                if (role == "DRIVER") {
+                    activityNavigationCust().authActivityCustomer(this@MainActivity)
+                    finish()
+                }
             }
         }
 

@@ -23,8 +23,12 @@ class AuthViewModel(
         authRepository.postLogin(username, password)
     }
 
-    fun signUp(username: String, password: String) = authSafeScope.launch {
-        authRepository.postRegister(username, password)
+    fun signUpCustomer(username: String, password: String) = authSafeScope.launch {
+        authRepository.postRegister(username, password, "customer")
+    }
+
+    fun signUpDriver(username: String, password: String) = authSafeScope.launch {
+        authRepository.postRegister(username, password, "driver")
     }
 
     fun saveToken(token: String) = authSafeScope.launch {

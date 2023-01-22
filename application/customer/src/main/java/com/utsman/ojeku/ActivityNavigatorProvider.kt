@@ -10,8 +10,16 @@ class ActivityNavigatorProvider : ActivityNavigatorCustomer {
         context?.intentTo(MainActivity::class)
     }
 
-    override fun authActivity(context: Context?) {
-        context?.intentTo(AuthActivity::class)
+    override fun authActivityCustomer(context: Context?) {
+        context?.intentTo(AuthActivity::class) {
+            it.putExtra("type", "customer")
+        }
+    }
+
+    override fun authActivityDriver(context: Context?) {
+        context?.intentTo(AuthActivity::class) {
+            it.putExtra("type", "driver")
+        }
     }
 
     companion object {

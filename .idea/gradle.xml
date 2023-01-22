@@ -20,6 +20,8 @@
             <option value="$PROJECT_DIR$/features/cust/home" />
             <option value="$PROJECT_DIR$/features/cust/profile" />
             <option value="$PROJECT_DIR$/features/cust/search" />
+            <option value="$PROJECT_DIR$/features/driver" />
+            <option value="$PROJECT_DIR$/features/driver/home" />
             <option value="$PROJECT_DIR$/features/location-api" />
             <option value="$PROJECT_DIR$/shared" />
             <option value="$PROJECT_DIR$/shared/core" />

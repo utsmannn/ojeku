@@ -20,7 +20,7 @@ interface AuthWebServices {
     @POST(EndPoint.REGISTER_DRIVER)
     suspend fun registerDriver(
         @Body request: Any
-    ): Response<Any>
+    ): Response<SignUpResponse>
 
     @POST(EndPoint.REGISTER_CUSTOMER)
     suspend fun registerCustomer(

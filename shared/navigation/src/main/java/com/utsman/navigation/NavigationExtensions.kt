@@ -12,8 +12,9 @@ fun Context.intentTo(className: String) {
     startActivity(intent)
 }
 
-fun Context.intentTo(clazz: KClass<*>) {
+fun Context.intentTo(clazz: KClass<*>, onIntent: (Intent) -> Unit = {}) {
     val intent = Intent(this, clazz.java)
+    onIntent.invoke(intent)
     startActivity(intent)
 }
 

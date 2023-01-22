@@ -309,7 +309,7 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomeFragmentListene
             updateMapsPadding()
 
             polylineAnimator.startAnimate(geometries) {
-                duration = 200L
+                duration = 500L
                 stackAnimationMode = StackAnimationMode.WaitStackEndAnimation
             }
         }
