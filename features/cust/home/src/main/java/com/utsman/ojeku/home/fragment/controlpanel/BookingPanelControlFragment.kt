@@ -1,6 +1,7 @@
 package com.utsman.ojeku.home.fragment.controlpanel
 
 import android.os.Bundle
+import com.utsman.core.CoroutineBus
 import com.utsman.core.extensions.onSuccess
 import com.utsman.core.state.StateEvent
 import com.utsman.ojeku.booking.Booking
@@ -24,6 +25,16 @@ class BookingPanelControlFragment : BindingFragment<FragmentPanelControlBookingB
                 onReady(this)
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        CoroutineBus.getInstance().post("hide_navigation_menu", true)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        CoroutineBus.getInstance().post("hide_navigation_menu", false)
     }
 
     private fun onReady(booking: Booking) {
