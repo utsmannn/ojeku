@@ -4,6 +4,7 @@ import android.app.Application
 import com.ojeku.profile.di.ProfileModule
 import com.utsman.driver.home.HomeModule
 import com.utsman.koin.KoinStarter
+import com.utsman.ojeku.booking.BookingModule
 
 class MainDriver : Application() {
 
@@ -12,6 +13,7 @@ class MainDriver : Application() {
         KoinStarter.onCreate(this, listOf(
             MainModule.modules(),
             HomeModule.modules(),
+            BookingModule.modules(),
             ProfileModule.modules()
         ))
     }

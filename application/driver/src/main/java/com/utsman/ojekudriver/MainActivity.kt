@@ -1,13 +1,16 @@
 package com.utsman.ojekudriver
 
 import android.os.Bundle
+import androidx.lifecycle.lifecycleScope
 import com.google.firebase.messaging.FirebaseMessaging
+import com.utsman.core.CoroutineBus
 import com.utsman.core.extensions.onFailure
 import com.utsman.core.extensions.onSuccess
 import com.utsman.core.extensions.setup
 import com.utsman.driver.home.HomeFragment
 import com.utsman.navigation.activityNavigationCust
 import com.utsman.navigation.activityNavigationDriver
+import com.utsman.network.ServiceMessage
 import com.utsman.ojekudriver.databinding.ActivityMainBinding
 import com.utsman.utils.BindingActivity
 import org.koin.androidx.viewmodel.ext.android.viewModel

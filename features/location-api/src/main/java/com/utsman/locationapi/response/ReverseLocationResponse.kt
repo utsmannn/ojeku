@@ -29,9 +29,9 @@ data class ReverseLocationResponse(
         )
 
         data class Coordinate(
-            @SerializedName("latitude")
+            @SerializedName("lat")
             val latitude: Double?,
-            @SerializedName("longitude")
+            @SerializedName("lng")
             val longitude: Double?
         )
     }

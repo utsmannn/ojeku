@@ -6,6 +6,7 @@ import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 class RetrofitBuilder(private val tokenizer: Tokenizer) {
     companion object {
@@ -19,6 +20,10 @@ class RetrofitBuilder(private val tokenizer: Tokenizer) {
         return OkHttpClient()
             .newBuilder()
             .addInterceptor(logInterceptor)
+            .callTimeout(2 * 60, TimeUnit.SECONDS)
+            .connectTimeout(2 * 60, TimeUnit.SECONDS)
+            .readTimeout(2 * 60, TimeUnit.SECONDS)
+            .writeTimeout(2 * 60, TimeUnit.SECONDS)
             .run {
                 if (isRequiredToken) {
                     addInterceptor { chain ->

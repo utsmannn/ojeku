@@ -4,11 +4,14 @@ import com.utsman.core.RepositoryProvider
 import com.utsman.core.extensions.value
 import com.utsman.core.state.StateEvent
 import com.utsman.locationapi.entity.LocationData
+import com.utsman.network.ServiceMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 interface BookingRepository {
     val bookingCustomer: StateFlow<StateEvent<Booking>>
+    val rejectBookingState: StateFlow<StateEvent<Boolean>>
+    val acceptBookingState: StateFlow<StateEvent<Booking>>
 
     suspend fun createBookingCustomer(
         fromLocationData: LocationData,
@@ -19,8 +22,14 @@ interface BookingRepository {
         status: Booking.BookingStatus
     )
 
+    suspend fun getBookingById(bookingId: String)
+
     suspend fun requestBookingCustomer(bookingId: String, transType: Booking.TransType)
     suspend fun cancelBookingCustomer(bookingId: String)
+    suspend fun cancelByService(serviceMessage: ServiceMessage)
+
+    suspend fun rejectBookingDriver(bookingId: String)
+    suspend fun acceptBookingDriver(bookingId: String)
 
     suspend fun restartStateBookingCustomer()
 
@@ -31,6 +40,16 @@ interface BookingRepository {
             MutableStateFlow(StateEvent.Idle())
         override val bookingCustomer: StateFlow<StateEvent<Booking>>
             get() = _bookingCustomer
+
+        private val _rejectBookingState: MutableStateFlow<StateEvent<Boolean>> =
+            MutableStateFlow(StateEvent.Idle())
+        override val rejectBookingState: StateFlow<StateEvent<Boolean>>
+            get() = _rejectBookingState
+
+        private val _acceptBookingState: MutableStateFlow<StateEvent<Booking>> =
+            MutableStateFlow(StateEvent.Idle())
+        override val acceptBookingState: StateFlow<StateEvent<Booking>>
+            get() = _acceptBookingState
 
         override suspend fun createBookingCustomer(
             fromLocationData: LocationData,
@@ -69,6 +88,18 @@ interface BookingRepository {
             )
         }
 
+        override suspend fun getBookingById(bookingId: String) {
+            bindToState(
+                stateFlow = _bookingCustomer,
+                onFetch = {
+                    webServices.getBookingById(bookingId)
+                },
+                mapper = {
+                    BookingMapper.mapResponseToBooking(it)
+                }
+            )
+        }
+
         override suspend fun requestBookingCustomer(
             bookingId: String,
             transType: Booking.TransType
@@ -89,6 +120,34 @@ interface BookingRepository {
                 stateFlow = _bookingCustomer,
                 onFetch = {
                     webServices.cancelBookingCustomer(bookingId)
+                },
+                mapper = {
+                    BookingMapper.mapResponseToBooking(it)
+                }
+            )
+        }
+
+        override suspend fun cancelByService(serviceMessage: ServiceMessage) {
+            _bookingCustomer.value = StateEvent.Failure(Throwable(serviceMessage.message))
+        }
+
+        override suspend fun rejectBookingDriver(bookingId: String) {
+            bindToState(
+                stateFlow = _rejectBookingState,
+                onFetch = {
+                    webServices.rejectBookingDriver(bookingId)
+                },
+                mapper = {
+                    it.data ?: false
+                }
+            )
+        }
+
+        override suspend fun acceptBookingDriver(bookingId: String) {
+            bindToState(
+                stateFlow = _acceptBookingState,
+                onFetch = {
+                    webServices.acceptBookingDriver(bookingId)
                 },
                 mapper = {
                     BookingMapper.mapResponseToBooking(it)

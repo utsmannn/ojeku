@@ -14,7 +14,8 @@ class CoroutineBus {
 
     private data class DataBus<T>(
         val key: String,
-        val data: T
+        val data: T,
+        val time: Long = System.currentTimeMillis()
     )
 
     private val stateBus: MutableStateFlow<DataBus<*>?> = MutableStateFlow(null)

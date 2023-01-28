@@ -9,13 +9,12 @@ import com.google.android.gms.maps.model.LatLng
 import com.utsman.core.extensions.convertEventToSubscriber
 import com.utsman.core.extensions.onSuccess
 import com.utsman.core.extensions.value
-import com.utsman.core.state.StateEvent
 import com.utsman.core.state.StateEventSubscriber
 import com.utsman.locationapi.entity.LocationData
+import com.utsman.network.ServiceMessage
 import com.utsman.ojeku.booking.Booking
 import com.utsman.ojeku.booking.BookingRepository
 import com.utsman.ojeku.home.repo.HomeRepository
-import com.utsman.utils.snackBar
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -81,8 +80,13 @@ class HomeViewModel(
         repository.getLocation()
     }
 
-    fun createBooking(fromLocationData: LocationData, destinationLocationData: LocationData) = viewModelScope.launch {
-        bookingRepository.createBookingCustomer(fromLocationData, destinationLocationData)
+    fun createBooking(fromLocationData: LocationData, destinationLocationData: LocationData) =
+        viewModelScope.launch {
+            bookingRepository.createBookingCustomer(fromLocationData, destinationLocationData)
+        }
+
+    fun getBooking(bookingId: String) = viewModelScope.launch {
+        bookingRepository.getBookingById(bookingId)
     }
 
     fun cancelCurrentReadyBooking() = bookingState.value?.onSuccess {
@@ -93,8 +97,21 @@ class HomeViewModel(
         }
     }
 
+    fun cancelCurrentReadyBookingByServices(message: ServiceMessage) = viewModelScope.launch {
+        if (message.type == ServiceMessage.Type.BOOKING_UNAVAILABLE) {
+            bookingRepository.cancelByService(message)
+        }
+    }
+
     fun getCurrentReadyBooking() = viewModelScope.launch {
         bookingRepository.getCurrentBooking(Booking.BookingStatus.READY)
+    }
+
+    fun retryBooking() = viewModelScope.launch {
+        val currentBooking = bookingState.value?.value
+        if (currentBooking != null && currentBooking.status == Booking.BookingStatus.REQUEST_RETRY) {
+            bookingRepository.requestBookingCustomer(currentBooking.id, currentBooking.transType)
+        }
     }
 
     fun setClearThrowableHandler() {

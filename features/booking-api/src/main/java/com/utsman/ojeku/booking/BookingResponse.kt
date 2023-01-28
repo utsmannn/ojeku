@@ -53,9 +53,9 @@ data class BookingResponse(
                 )
 
                 data class CoordinateResponse(
-                    @SerializedName("latitude")
+                    @SerializedName("lat")
                     var latitude: Double? = null,
-                    @SerializedName("longitude")
+                    @SerializedName("lng")
                     var longitude: Double? = null
                 )
             }
@@ -67,9 +67,9 @@ data class BookingResponse(
                 var distance: Long? = null
             ) {
                 data class RouteResponse(
-                    @SerializedName("latitude")
+                    @SerializedName("lat")
                     var latitude: Double? = null,
-                    @SerializedName("longitude")
+                    @SerializedName("lng")
                     var longitude: Double? = null
                 )
             }

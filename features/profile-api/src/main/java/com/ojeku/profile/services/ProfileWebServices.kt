@@ -12,6 +12,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ProfileWebServices {
@@ -32,7 +33,17 @@ interface ProfileWebServices {
     @PUT("/api/user/location")
     suspend fun updateUserLocation(
         @Query("coordinate") coordinateString: String
-    ): Response<UserLocationResponse>
+    ): Response<UserResponse>
+
+    @GET("/api/user/customer/{customer_id}")
+    suspend fun getCustomerById(
+        @Path("customer_id") customerId: String
+    ): Response<UserResponse>
+
+    @GET("/api/user/driver/{driver_id}")
+    suspend fun getDriverById(
+        @Path("driver_id") customerId: String
+    ): Response<UserResponse>
 
     companion object : KoinComponent {
         private val retrofitBuilder: RetrofitBuilder by inject()

@@ -18,9 +18,9 @@ data class UserLocationResponse(
         var coordinate: CoordinateResponse? = null
     ) {
         data class CoordinateResponse(
-            @SerializedName("latitude")
+            @SerializedName("lat")
             var latitude: Double? = null,
-            @SerializedName("longitude")
+            @SerializedName("lng")
             var longitude: Double? = null
         )
     }

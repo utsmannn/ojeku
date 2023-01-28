@@ -8,4 +8,5 @@ interface HomePanelFragmentNavigatorListener : FragmentListener {
     fun navigateToLocationListFragment()
     fun navigateToBookingReadyFragment()
     fun navigateToBookingFragment()
+    fun navigateToPickupFragment()
 }

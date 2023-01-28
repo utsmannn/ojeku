@@ -10,37 +10,33 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.RoundCap
+import com.google.android.gms.maps.model.*
+import com.utsman.core.CoreDrawable
 import com.utsman.core.CoroutineBus
 import com.utsman.core.extensions.*
 import com.utsman.core.state.StateEventSubscriber
 import com.utsman.core.view.component.InputLocationView
-import com.utsman.geolib.marker.clearAllLayers
+import com.utsman.geolib.marker.moveMarker
 import com.utsman.geolib.polyline.PolylineAnimatorBuilder
-import com.utsman.geolib.polyline.data.PolylineDrawMode
+import com.utsman.geolib.polyline.data.PolylineConfig
 import com.utsman.geolib.polyline.data.StackAnimationMode
+import com.utsman.geolib.polyline.point.PointPolyline
 import com.utsman.geolib.polyline.polyline.PolylineAnimator
 import com.utsman.geolib.polyline.utils.createPolylineAnimatorBuilder
 import com.utsman.locationapi.entity.LocationData
 import com.utsman.navigation.activityNavigationCust
 import com.utsman.navigation.replaceFragment
+import com.utsman.network.ServiceMessage
 import com.utsman.ojeku.booking.Booking
 import com.utsman.ojeku.booking.BookingDrawable
+import com.utsman.ojeku.booking.UpdateLocationBooking
 import com.utsman.ojeku.booking.toLocationData
-import com.utsman.ojeku.home.viewmodel.HomeViewModel
-import com.utsman.ojeku.home.MainActivityListener
 import com.utsman.ojeku.home.R
 import com.utsman.ojeku.home.databinding.FragmentHomeBinding
-import com.utsman.ojeku.home.fragment.controlpanel.BookingPanelControlFragment
-import com.utsman.ojeku.home.fragment.controlpanel.LoadingPanelControlFragment
-import com.utsman.ojeku.home.fragment.controlpanel.LocationListPanelControlFragment
-import com.utsman.ojeku.home.fragment.controlpanel.ReadyPanelControlFragment
+import com.utsman.ojeku.home.fragment.controlpanel.*
+import com.utsman.ojeku.home.viewmodel.HomeViewModel
 import com.utsman.utils.BindingFragment
 import com.utsman.utils.isGrantedLocation
-import com.utsman.utils.listener.findActivityListener
 import com.utsman.utils.snackBar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -64,6 +60,10 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), /*HomeFragmentListe
 
     private var fromLocation: LocationData = LocationData()
     private var destLocation: LocationData = LocationData()
+    private var isSkipLoading = false
+
+    private var driverMarker: Marker? = null
+    private var currentPolyline: Polyline? = null
 
     private val locationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -94,10 +94,6 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), /*HomeFragmentListe
         return FragmentHomeBinding.inflate(layoutInflater)
     }
 
-    private fun getActivityListener(): MainActivityListener? {
-        return findActivityListener()
-    }
-
     override fun onCreateBinding(savedInstanceState: Bundle?) {
         val mapFragment = childFragmentManager
             .findFragmentById(R.id.map_view) as SupportMapFragment
@@ -112,8 +108,14 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), /*HomeFragmentListe
             binding.inputCardView.inputLocationDestData = InputLocationView.locationDataLoading()
 
             animatorBuilder = map.createPolylineAnimatorBuilder(
-                primaryColor = ContextCompat.getColor(requireContext(), com.utsman.core.R.color.green),
-                accentColor = ContextCompat.getColor(requireContext(), com.utsman.core.R.color.white)
+                primaryColor = ContextCompat.getColor(
+                    requireContext(),
+                    com.utsman.core.R.color.green
+                ),
+                accentColor = ContextCompat.getColor(
+                    requireContext(),
+                    com.utsman.core.R.color.white
+                )
             ).withPrimaryPolyline {
                 endCap(RoundCap())
                 startCap(RoundCap())
@@ -132,7 +134,6 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), /*HomeFragmentListe
         subscribeThrowable()
 
         binding.inputCardView.onFromClick {
-            //getActivityListener()?.navigateToSearchLocation(MainActivityListener.FormType.FROM)
             activityNavigationCust().searchLocationActivity(context) {
                 it.putExtra("formType", 1)
                 it.putExtra("location_from", fromLocation)
@@ -166,35 +167,55 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), /*HomeFragmentListe
                 navigateToLocationListFragment()
             }
             it.onLoading {
-                navigateToLoading()
+                if (!isSkipLoading) {
+                    navigateToLoading()
+                }
             }
             it.onSuccess {
                 map.clear()
+                driverMarker = null
+                currentPolyline = null
 
+                isSkipLoading = this.status == Booking.BookingStatus.REQUEST_RETRY
                 when (status) {
                     Booking.BookingStatus.READY -> {
                         val currentFromLocationData = routeLocation.from.toLocationData()
                         val currentDestLocationData = routeLocation.destination.toLocationData()
 
-                        binding.inputCardView.inputLocationFromData = InputLocationView.InputLocationData(
-                            location = currentFromLocationData.latLng.toLocation(),
-                            name = currentFromLocationData.name
-                        )
-                        binding.inputCardView.inputLocationDestData = InputLocationView.InputLocationData(
-                            location = currentDestLocationData.latLng.toLocation(),
-                            name = currentDestLocationData.name
-                        )
+                        binding.inputCardView.inputLocationFromData =
+                            InputLocationView.InputLocationData(
+                                location = currentFromLocationData.latLng.toLocation(),
+                                name = currentFromLocationData.name
+                            )
+                        binding.inputCardView.inputLocationDestData =
+                            InputLocationView.InputLocationData(
+                                location = currentDestLocationData.latLng.toLocation(),
+                                name = currentDestLocationData.name
+                            )
 
                         navigateToBookingReadyFragment()
-                        setupDecoratedMaps(currentFromLocationData, currentDestLocationData, this.routeLocation)
+                        setupDecoratedMaps(
+                            currentFromLocationData,
+                            currentDestLocationData,
+                            this.routeLocation
+                        )
                     }
                     Booking.BookingStatus.REQUEST -> {
                         navigateToBookingFragment()
                     }
-                    Booking.BookingStatus.UNDEFINE -> navigateToLocationListFragment()
+                    Booking.BookingStatus.UNDEFINE -> {
+                        navigateToLocationListFragment()
+                    }
                     Booking.BookingStatus.CANCELED -> {
                         viewModel.setLocationDest(LocationData())
                         navigateToLocationListFragment()
+                    }
+                    Booking.BookingStatus.REQUEST_RETRY -> {
+                        viewModel.retryBooking()
+                    }
+                    Booking.BookingStatus.ACCEPTED -> {
+                        navigateToPickupFragment()
+                        binding.snackBar("Accepted -> ${this.driverId}")
                     }
                     else -> {}
                 }
@@ -209,6 +230,31 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), /*HomeFragmentListe
                 navigateToLocationListFragment()
             }
         }
+
+        CoroutineBus.getInstance()
+            .getLiveData<ServiceMessage>(
+                ServiceMessage.Type.BOOKING_UNAVAILABLE.name,
+                lifecycleScope
+            )
+            .observe(this) {
+                viewModel.cancelCurrentReadyBookingByServices(it)
+            }
+
+        CoroutineBus.getInstance()
+            .getLiveData<ServiceMessage>(ServiceMessage.Type.BOOKING.name, lifecycleScope)
+            .observe(this) {
+                isSkipLoading = true
+                viewModel.getBooking(it.bookingId)
+            }
+
+        CoroutineBus.getInstance()
+            .getLiveData<ServiceMessage>(ServiceMessage.Type.BOOKING_LOCATION.name, lifecycleScope)
+            .observe(this) {
+                val currentBooking = viewModel.bookingState.value?.value
+                if (currentBooking != null && currentBooking.status == Booking.BookingStatus.ACCEPTED) {
+                    setupDecoratedMapsBookingAccepted(currentBooking, it)
+                }
+            }
     }
 
     @AfterPermissionGranted(value = RC_LOCATION)
@@ -328,6 +374,88 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), /*HomeFragmentListe
         }
     }
 
+    private fun setupDecoratedMapsBookingAccepted(booking: Booking, serviceMessage: ServiceMessage) {
+        val pickupCoordinate = booking.routeLocation.from.coordinate
+
+        val updateLocationBooking = serviceMessage.json.fromJson<UpdateLocationBooking>()
+        val driverCoordinate = updateLocationBooking.driver.toCoordinate()
+        val geometries = updateLocationBooking.route?.toRoutes()?.route.orEmpty().map { coor ->
+            LatLng(coor.latitude, coor.longitude)
+        }
+
+        if (driverMarker == null) {
+            driverMarker = map.addMarker(
+                MarkerOptions()
+                    .position(LatLng(driverCoordinate.latitude, driverCoordinate.longitude))
+                    .iconResVector(CoreDrawable.ic_marker_driver, requireContext())
+            )
+
+            map.addMarker(
+                MarkerOptions()
+                    .position(LatLng(pickupCoordinate.latitude, pickupCoordinate.longitude))
+                    .iconResVector(BookingDrawable.ic_marker_start, requireContext())
+            )
+
+        } else {
+            driverMarker?.moveMarker(LatLng(driverCoordinate.latitude, driverCoordinate.longitude), true)
+        }
+
+        if (currentPolyline == null) {
+            currentPolyline = map.addPolyline(
+                PolylineOptions()
+                    .addAll(geometries)
+                    .width(8f)
+                    .color(ContextCompat.getColor(requireContext(), com.utsman.core.R.color.green))
+                    .endCap(RoundCap())
+                    .startCap(RoundCap())
+            )
+        } else {
+            currentPolyline?.points = geometries
+        }
+
+        /*CoroutineBus.getInstance()
+            .getLiveData<ServiceMessage>(ServiceMessage.Type.BOOKING_LOCATION.name, lifecycleScope)
+            .observe(this) {
+                val pickupCoordinate = booking.routeLocation.from.coordinate
+
+                val updateLocationBooking = it.json.fromJson<UpdateLocationBooking>()
+                val driverCoordinate = updateLocationBooking.driver.toCoordinate()
+                val geometries = updateLocationBooking.route?.toRoutes()?.route.orEmpty().map { coor ->
+                    LatLng(coor.latitude, coor.longitude)
+                }
+
+                if (driverMarker == null) {
+                    driverMarker = map.addMarker(
+                        MarkerOptions()
+                            .position(LatLng(driverCoordinate.latitude, driverCoordinate.longitude))
+                            .iconResVector(CoreDrawable.ic_marker_driver, requireContext())
+                    )
+
+                    map.addMarker(
+                        MarkerOptions()
+                            .position(LatLng(pickupCoordinate.latitude, pickupCoordinate.longitude))
+                            .iconResVector(BookingDrawable.ic_marker_start, requireContext())
+                    )
+
+                } else {
+                    driverMarker?.moveMarker(LatLng(driverCoordinate.latitude, driverCoordinate.longitude), true)
+                }
+
+                if (currentPolyline == null) {
+                    currentPolyline = map.addPolyline(
+                        PolylineOptions()
+                            .addAll(geometries)
+                            .width(8f)
+                            .color(ContextCompat.getColor(requireContext(), com.utsman.core.R.color.green))
+                            .endCap(RoundCap())
+                            .startCap(RoundCap())
+                    )
+                } else {
+                    currentPolyline?.points = geometries
+                }
+            }*/
+    }
+
     override fun navigateToLoading() {
         panelTag = childFragmentManager.replaceFragment(
             binding.framePanelControl,
@@ -356,6 +484,14 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), /*HomeFragmentListe
         panelTag = childFragmentManager.replaceFragment(
             binding.framePanelControl,
             BookingPanelControlFragment::class
+        )
+        updateMapsPadding()
+    }
+
+    override fun navigateToPickupFragment() {
+        panelTag = childFragmentManager.replaceFragment(
+            binding.framePanelControl,
+            PickupPanelControlFragment::class
         )
         updateMapsPadding()
     }

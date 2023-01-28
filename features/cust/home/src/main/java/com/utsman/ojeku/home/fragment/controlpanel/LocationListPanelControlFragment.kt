@@ -56,6 +56,11 @@ class LocationListPanelControlFragment :
         binding.rvLocation.adapter = locationAdapter
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel.setLocationDest(LocationData())
+    }
+
     private fun bindAdapter(view: View, position: Int, item: LocationData) {
         LocationManager.instance.getLastLocation { location ->
             ItemSearchLocationBinding.bind(view).onBindAdapter(

@@ -17,7 +17,7 @@ data class Booking(
     )
 
     enum class BookingStatus {
-        READY, REQUEST, ACCEPTED, CANCELED, ONGOING, DONE, UNDEFINE
+        READY, REQUEST, REQUEST_RETRY, ACCEPTED, CANCELED, ONGOING, DONE, UNDEFINE
     }
 
     enum class TransType {
