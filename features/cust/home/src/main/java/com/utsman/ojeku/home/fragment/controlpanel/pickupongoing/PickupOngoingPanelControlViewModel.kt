@@ -1,4 +1,4 @@
-package com.utsman.ojeku.home.fragment.controlpanel
+package com.utsman.ojeku.home.fragment.controlpanel.pickupongoing
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -16,8 +16,8 @@ class PickupOngoingPanelControlViewModel(
     val driverState = profileRepository.otherUserState.asLiveData(viewModelScope.coroutineContext)
     val estimatedDuration = bookingRepository.estimatedDuration.asLiveData(viewModelScope.coroutineContext)
 
-    fun cancel(bookingId: String) = viewModelScope.launch {
-        bookingRepository.cancelBookingCustomer(bookingId)
+    fun cancel() = viewModelScope.launch {
+        bookingRepository.cancelState(true)
     }
 
     fun getDriver(driverId: String) = viewModelScope.launch {

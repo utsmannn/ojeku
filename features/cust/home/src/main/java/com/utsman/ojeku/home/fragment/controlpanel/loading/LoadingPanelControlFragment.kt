@@ -1,4 +1,4 @@
-package com.utsman.ojeku.home.fragment.controlpanel
+package com.utsman.ojeku.home.fragment.controlpanel.loading
 
 import android.os.Bundle
 import com.utsman.ojeku.home.databinding.FragmentPanelControlLoadingBinding

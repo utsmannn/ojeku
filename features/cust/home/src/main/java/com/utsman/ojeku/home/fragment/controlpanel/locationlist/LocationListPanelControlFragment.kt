@@ -1,4 +1,4 @@
-package com.utsman.ojeku.home.fragment.controlpanel
+package com.utsman.ojeku.home.fragment.controlpanel.locationlist
 
 import android.os.Bundle
 import android.view.View
@@ -16,7 +16,6 @@ import com.utsman.locationapi.ui.onBindAdapter
 import com.utsman.ojeku.home.databinding.FragmentPanelControlLocationListBinding
 import com.utsman.utils.BindingFragment
 import com.utsman.utils.adapter.genericAdapter
-import com.utsman.utils.snackBar
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class LocationListPanelControlFragment :

@@ -1,9 +1,10 @@
 package com.utsman.ojeku.home.di
 
-import com.utsman.ojeku.home.fragment.controlpanel.BookingPanelControlViewModel
-import com.utsman.ojeku.home.fragment.controlpanel.LocationListPanelControlViewModel
-import com.utsman.ojeku.home.fragment.controlpanel.PickupOngoingPanelControlViewModel
-import com.utsman.ojeku.home.fragment.controlpanel.ReadyPanelControlViewModel
+import com.utsman.ojeku.home.fragment.controlpanel.booking.BookingPanelControlViewModel
+import com.utsman.ojeku.home.fragment.controlpanel.cancel.CancelPanelControlViewModel
+import com.utsman.ojeku.home.fragment.controlpanel.locationlist.LocationListPanelControlViewModel
+import com.utsman.ojeku.home.fragment.controlpanel.pickupongoing.PickupOngoingPanelControlViewModel
+import com.utsman.ojeku.home.fragment.controlpanel.ready.ReadyPanelControlViewModel
 import com.utsman.ojeku.home.repo.HomeRepository
 import com.utsman.ojeku.home.repo.HomeRepositoryImpl
 import com.utsman.ojeku.home.repo.LocationListRepository
@@ -20,5 +21,6 @@ object HomeModule {
         viewModel { ReadyPanelControlViewModel(get()) }
         viewModel { BookingPanelControlViewModel(get()) }
         viewModel { PickupOngoingPanelControlViewModel(get(), get()) }
+        viewModel { CancelPanelControlViewModel(get()) }
     }
 }

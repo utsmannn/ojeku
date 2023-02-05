@@ -1,4 +1,4 @@
-package com.utsman.ojeku.home.fragment.controlpanel
+package com.utsman.ojeku.home.fragment.controlpanel.ready
 
 import android.os.Bundle
 import com.utsman.core.extensions.onSuccess

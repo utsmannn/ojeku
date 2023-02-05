@@ -1,10 +1,13 @@
 package com.utsman.ojeku.home.fragment
 
 import android.Manifest
+import android.app.Dialog
 import android.location.Location
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -30,8 +33,14 @@ import com.utsman.ojeku.booking.BookingDrawable
 import com.utsman.ojeku.booking.UpdateLocationBooking
 import com.utsman.ojeku.booking.toLocationData
 import com.utsman.ojeku.home.R
+import com.utsman.ojeku.home.databinding.DialogCancelBinding
 import com.utsman.ojeku.home.databinding.FragmentHomeBinding
-import com.utsman.ojeku.home.fragment.controlpanel.*
+import com.utsman.ojeku.home.fragment.controlpanel.booking.BookingPanelControlFragment
+import com.utsman.ojeku.home.fragment.controlpanel.cancel.CancelPanelControlFragment
+import com.utsman.ojeku.home.fragment.controlpanel.loading.LoadingPanelControlFragment
+import com.utsman.ojeku.home.fragment.controlpanel.locationlist.LocationListPanelControlFragment
+import com.utsman.ojeku.home.fragment.controlpanel.pickupongoing.PickupOngoingPanelControlFragment
+import com.utsman.ojeku.home.fragment.controlpanel.ready.ReadyPanelControlFragment
 import com.utsman.ojeku.home.viewmodel.HomeViewModel
 import com.utsman.utils.BindingFragment
 import com.utsman.utils.isGrantedLocation
@@ -64,6 +73,22 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), /*HomeFragmentListe
     private var driverMarker: Marker? = null
     private var otherMarker: Marker? = null
     private var currentPolyline: Polyline? = null
+
+    private val cancelDialog: Dialog by lazy {
+        val dialogBinding = DialogCancelBinding.bind(
+            LayoutInflater.from(context).inflate(R.layout.dialog_cancel, null)
+        )
+
+        val dialogBuilder = AlertDialog.Builder(requireContext())
+            .setView(dialogBinding.root)
+            .create()
+
+        dialogBinding.btnConfirm.setOnClickListener {
+            dialogBuilder.dismiss()
+        }
+
+        return@lazy dialogBuilder
+    }
 
     private val locationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -211,15 +236,29 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), /*HomeFragmentListe
                         viewModel.setLocationDest(LocationData())
                         viewModel.clearEstimatedDuration()
                         navigateToLocationListFragment()
+
+                        cancelDialog.show()
                     }
                     Booking.BookingStatus.REQUEST_RETRY -> {
                         viewModel.retryBooking()
                     }
                     Booking.BookingStatus.ACCEPTED -> {
-                        navigateToPickupOngoingFragment()
+                        viewModel.cancelUiState.observe(this@HomeFragment) { isCancel ->
+                            if (isCancel) {
+                                navigateToCancelFragment()
+                            } else {
+                                navigateToPickupOngoingFragment()
+                            }
+                        }
                     }
                     Booking.BookingStatus.ONGOING -> {
-                        navigateToPickupOngoingFragment()
+                        viewModel.cancelUiState.observe(this@HomeFragment) { isCancel ->
+                            if (isCancel) {
+                                navigateToCancelFragment()
+                            } else {
+                                navigateToPickupOngoingFragment()
+                            }
+                        }
                     }
                     else -> {}
                 }
@@ -255,11 +294,6 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), /*HomeFragmentListe
         CoroutineBus.getInstance()
             .getLiveData<UpdateLocationBooking>("update_routes_booking", lifecycleScope)
             .observe(this) {
-                /*val currentBooking = viewModel.bookingState.value?.value
-                if (currentBooking != null && currentBooking.status == Booking.BookingStatus.ACCEPTED) {
-                    setupDecoratedMapsBookingAcceptedOnGoing(currentBooking, it)
-                }*/
-
                 val currentBooking = viewModel.bookingState.value?.value
                 val isStatusValid = when (currentBooking?.status) {
                     Booking.BookingStatus.ACCEPTED, Booking.BookingStatus.ONGOING -> true
@@ -496,6 +530,14 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), /*HomeFragmentListe
         panelTag = childFragmentManager.replaceFragment(
             binding.framePanelControl,
             PickupOngoingPanelControlFragment::class
+        )
+        updateMapsPadding()
+    }
+
+    override fun navigateToCancelFragment() {
+        panelTag = childFragmentManager.replaceFragment(
+            binding.framePanelControl,
+            CancelPanelControlFragment::class
         )
         updateMapsPadding()
     }

@@ -31,7 +31,8 @@ interface BookingWebServices {
 
     @POST("/api/booking/customer/cancel")
     suspend fun cancelBookingCustomer(
-        @Query("booking_id") bookingId: String
+        @Query("booking_id") bookingId: String,
+        @Query("reason_id") reasonId: String
     ): Response<BookingResponse>
 
     @GET("/api/booking/customer/reason")

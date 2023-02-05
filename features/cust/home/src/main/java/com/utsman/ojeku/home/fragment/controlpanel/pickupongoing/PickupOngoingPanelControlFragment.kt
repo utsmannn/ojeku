@@ -1,4 +1,4 @@
-package com.utsman.ojeku.home.fragment.controlpanel
+package com.utsman.ojeku.home.fragment.controlpanel.pickupongoing
 
 import android.os.Bundle
 import com.ojeku.profile.entity.mapToDriverExtra
@@ -38,7 +38,7 @@ class PickupOngoingPanelControlFragment : BindingFragment<FragmentPanelControlPi
                         binding.btnCancel.text = "Cancel Booking"
 
                         binding.btnCancel.setOnClickListener {
-                            viewModel.cancel(id)
+                            viewModel.cancel()
                         }
                     }
                     Booking.BookingStatus.ONGOING -> {
@@ -46,7 +46,7 @@ class PickupOngoingPanelControlFragment : BindingFragment<FragmentPanelControlPi
                         binding.btnCancel.text = "Report problem"
 
                         binding.btnCancel.setOnClickListener {
-                            viewModel.cancel(id)
+                            viewModel.cancel()
                         }
                     }
                     else -> {}

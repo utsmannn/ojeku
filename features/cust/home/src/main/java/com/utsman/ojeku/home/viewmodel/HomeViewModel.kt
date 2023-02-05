@@ -45,6 +45,8 @@ class HomeViewModel(
 
     val bookingState = bookingRepository.bookingCustomer.asLiveData(viewModelScope.coroutineContext)
 
+    val cancelUiState = bookingRepository.cancelUiState.asLiveData(viewModelScope.coroutineContext)
+
     val filledLocationState: LiveData<Triple<Boolean, LocationData, LocationData>>
         get() {
             return repository.locationFrom.combine(repository.locationDestination) { from, dest ->
@@ -87,14 +89,6 @@ class HomeViewModel(
 
     fun getBooking(bookingId: String) = viewModelScope.launch {
         bookingRepository.getBookingById(bookingId)
-    }
-
-    fun cancelCurrentReadyBooking() = bookingState.value?.onSuccess {
-        viewModelScope.launch {
-            if (status == Booking.BookingStatus.READY) {
-                bookingRepository.cancelBookingCustomer(id)
-            }
-        }
     }
 
     fun cancelCurrentReadyBookingByServices(message: ServiceMessage) = viewModelScope.launch {

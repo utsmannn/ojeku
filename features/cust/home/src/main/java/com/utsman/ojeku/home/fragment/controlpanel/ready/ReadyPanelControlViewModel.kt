@@ -1,4 +1,4 @@
-package com.utsman.ojeku.home.fragment.controlpanel
+package com.utsman.ojeku.home.fragment.controlpanel.ready
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData

@@ -18,6 +18,8 @@ interface BookingRepository {
     val estimatedDuration: StateFlow<String>
     val pickupRoute: StateFlow<StateEvent<Booking.Routes>>
 
+    val cancelUiState: StateFlow<Boolean>
+
     suspend fun createBookingCustomer(
         fromLocationData: LocationData,
         destinationLocationData: LocationData
@@ -30,7 +32,7 @@ interface BookingRepository {
     suspend fun getBookingById(bookingId: String)
 
     suspend fun requestBookingCustomer(bookingId: String, transType: Booking.TransType)
-    suspend fun cancelBookingCustomer(bookingId: String)
+    suspend fun cancelBookingCustomer(bookingId: String, reasonId: String)
     suspend fun cancelByService(serviceMessage: ServiceMessage)
 
     suspend fun rejectBookingDriver(bookingId: String)
@@ -43,6 +45,10 @@ interface BookingRepository {
     suspend fun updateEstimatedDuration(updated: String)
     suspend fun updatePickupRoute(routes: Booking.Routes)
     suspend fun clearPickupRoute()
+
+    suspend fun getReason()
+
+    fun cancelState(showCancelPanel: Boolean)
 
     private class Impl(private val webServices: BookingWebServices) : BookingRepository,
         RepositoryProvider() {
@@ -71,25 +77,9 @@ interface BookingRepository {
         override val pickupRoute: StateFlow<StateEvent<Booking.Routes>>
             get() = _pickupRoute
 
-        init {
-            IOScope().launch {
-                bindToState(
-                    stateFlow = _cancelReasonState,
-                    onFetch = {
-                        webServices.reasonBookingCustomer()
-                    },
-                    mapper = {
-                        it.data.orEmpty().filterNotNull()
-                            .map { response ->
-                                BookingCancelReason(
-                                    id = response.id.orEmpty(),
-                                    name = response.name.orEmpty()
-                                )
-                            }
-                    }
-                )
-            }
-        }
+        private val _cancelUiState: MutableStateFlow<Boolean> = MutableStateFlow(false)
+        override val cancelUiState: StateFlow<Boolean>
+            get() = _cancelUiState
 
         override suspend fun createBookingCustomer(
             fromLocationData: LocationData,
@@ -97,7 +87,7 @@ interface BookingRepository {
         ) {
             val currentBooking = bookingCustomer.value.value
             if (currentBooking?.status == Booking.BookingStatus.READY) {
-                cancelBookingCustomer(currentBooking.id)
+                cancelBookingCustomer(currentBooking.id, "OTHER")
             }
 
 
@@ -155,11 +145,11 @@ interface BookingRepository {
             )
         }
 
-        override suspend fun cancelBookingCustomer(bookingId: String) {
+        override suspend fun cancelBookingCustomer(bookingId: String, reasonId: String) {
             bindToState(
                 stateFlow = _bookingCustomer,
                 onFetch = {
-                    webServices.cancelBookingCustomer(bookingId)
+                    webServices.cancelBookingCustomer(bookingId, reasonId)
                 },
                 mapper = {
                     BookingMapper.mapResponseToBooking(it)
@@ -233,6 +223,28 @@ interface BookingRepository {
 
         override suspend fun clearPickupRoute() {
             _pickupRoute.value = StateEvent.Idle()
+        }
+
+        override suspend fun getReason() {
+            bindToState(
+                stateFlow = _cancelReasonState,
+                onFetch = {
+                    webServices.reasonBookingCustomer()
+                },
+                mapper = {
+                    it.data.orEmpty().filterNotNull()
+                        .map { response ->
+                            BookingCancelReason(
+                                id = response.id.orEmpty(),
+                                name = response.name.orEmpty()
+                            )
+                        }
+                }
+            )
+        }
+
+        override fun cancelState(showCancelPanel: Boolean) {
+            _cancelUiState.value = showCancelPanel
         }
     }
 
