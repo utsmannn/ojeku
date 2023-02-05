@@ -27,6 +27,7 @@ dependencies {
     implementation project(":shared:core")
     implementation project(":shared:koin")
     implementation project(":shared:navigation")
+    implementation project(":shared:socket")
 
     implementation project(":features:auth")
     implementation project(":features:location-api")

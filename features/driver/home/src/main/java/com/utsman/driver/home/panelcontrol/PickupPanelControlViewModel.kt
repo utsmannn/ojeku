@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.ojeku.profile.repository.ProfileRepository
 import com.utsman.core.extensions.value
 import com.utsman.driver.home.HomeRepository
+import com.utsman.ojeku.booking.Booking
 import com.utsman.ojeku.booking.BookingRepository
 import kotlinx.coroutines.launch
 
@@ -20,6 +21,7 @@ class PickupPanelControlViewModel(
     val customerState = profileRepository.otherUserState.asLiveData(viewModelScope.coroutineContext)
 
     val currentLocationState = homeRepository.currentLocation.asLiveData(viewModelScope.coroutineContext)
+    val pickupRouteState = bookingRepository.pickupRoute.asLiveData(viewModelScope.coroutineContext)
 
     fun reverseCurrentLocation() = viewModelScope.launch {
         val currentLocation = homeRepository.locationResult.value.value
@@ -29,5 +31,9 @@ class PickupPanelControlViewModel(
     }
     fun getCustomer(customerId: String) = viewModelScope.launch {
         profileRepository.getCustomer(customerId)
+    }
+
+    fun takeCustomer(bookingId: String) = viewModelScope.launch {
+        bookingRepository.takeBookingDriver(bookingId)
     }
 }

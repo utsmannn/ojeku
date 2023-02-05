@@ -34,6 +34,9 @@ interface BookingWebServices {
         @Query("booking_id") bookingId: String
     ): Response<BookingResponse>
 
+    @GET("/api/booking/customer/reason")
+    suspend fun reasonBookingCustomer(): Response<BookingCancelReasonResponse>
+
     @GET("/api/booking/{booking_id}")
     suspend fun getBookingById(
         @Path("booking_id") bookingId: String
@@ -46,6 +49,16 @@ interface BookingWebServices {
 
     @POST("/api/booking/driver/accept")
     suspend fun acceptBookingDriver(
+        @Query("booking_id") bookingId: String
+    ): Response<BookingResponse>
+
+    @POST("/api/booking/driver/take")
+    suspend fun takeBookingDriver(
+        @Query("booking_id") bookingId: String
+    ): Response<BookingResponse>
+
+    @POST("/api/booking/driver/complete")
+    suspend fun completeBookingDriver(
         @Query("booking_id") bookingId: String
     ): Response<BookingResponse>
 

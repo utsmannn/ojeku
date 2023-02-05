@@ -8,9 +8,9 @@
     android:padding="12dp">
 
     <TextView
+        android:id="@+id/tv_driver_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Driver is on the way"
         android:textStyle="bold" />
 
     <TextView

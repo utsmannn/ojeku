@@ -64,7 +64,9 @@ data class BookingResponse(
                 @SerializedName("route")
                 var route: List<RouteResponse?>? = null,
                 @SerializedName("distance")
-                var distance: Long? = null
+                var distance: Long? = null,
+                @SerializedName("duration_estimated")
+                var durationEstimated: Long? = null
             ) {
                 data class RouteResponse(
                     @SerializedName("lat")

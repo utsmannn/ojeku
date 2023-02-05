@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.ojeku.profile.repository.ProfileRepository
+import com.utsman.ojeku.booking.Booking
 import com.utsman.ojeku.booking.BookingRepository
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
@@ -22,8 +23,10 @@ class HomeViewModel(
         bookingRepository.bookingCustomer.asLiveData(viewModelScope.coroutineContext)
     val rejectBooking =
         bookingRepository.rejectBookingState.asLiveData(viewModelScope.coroutineContext)
-    val acceptBooking =
-        bookingRepository.acceptBookingState.asLiveData(viewModelScope.coroutineContext)
+
+    var isDisableFragmentLoading = false
+    var currentStatusBooking = Booking.BookingStatus.UNDEFINE
+    var currentBookingId = ""
 
     fun getLocation() = viewModelScope.launch {
         homeRepository.getLocation()
@@ -56,5 +59,13 @@ class HomeViewModel(
 
     fun acceptBooking(bookingId: String) = viewModelScope.launch {
         bookingRepository.acceptBookingDriver(bookingId)
+    }
+
+    fun updatePickupRoute(routes: Booking.Routes) = viewModelScope.launch {
+        bookingRepository.updatePickupRoute(routes)
+    }
+
+    fun clearPickupRoute() = viewModelScope.launch {
+        bookingRepository.clearPickupRoute()
     }
 }

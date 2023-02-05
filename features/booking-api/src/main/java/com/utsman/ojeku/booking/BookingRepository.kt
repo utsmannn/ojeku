@@ -1,17 +1,22 @@
 package com.utsman.ojeku.booking
 
 import com.utsman.core.RepositoryProvider
+import com.utsman.core.extensions.IOScope
 import com.utsman.core.extensions.value
 import com.utsman.core.state.StateEvent
 import com.utsman.locationapi.entity.LocationData
 import com.utsman.network.ServiceMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 interface BookingRepository {
     val bookingCustomer: StateFlow<StateEvent<Booking>>
     val rejectBookingState: StateFlow<StateEvent<Boolean>>
-    val acceptBookingState: StateFlow<StateEvent<Booking>>
+    val cancelReasonState: StateFlow<StateEvent<List<BookingCancelReason>>>
+
+    val estimatedDuration: StateFlow<String>
+    val pickupRoute: StateFlow<StateEvent<Booking.Routes>>
 
     suspend fun createBookingCustomer(
         fromLocationData: LocationData,
@@ -30,8 +35,14 @@ interface BookingRepository {
 
     suspend fun rejectBookingDriver(bookingId: String)
     suspend fun acceptBookingDriver(bookingId: String)
+    suspend fun takeBookingDriver(bookingId: String)
+    suspend fun completeBookingDriver(bookingId: String)
 
     suspend fun restartStateBookingCustomer()
+
+    suspend fun updateEstimatedDuration(updated: String)
+    suspend fun updatePickupRoute(routes: Booking.Routes)
+    suspend fun clearPickupRoute()
 
     private class Impl(private val webServices: BookingWebServices) : BookingRepository,
         RepositoryProvider() {
@@ -46,10 +57,39 @@ interface BookingRepository {
         override val rejectBookingState: StateFlow<StateEvent<Boolean>>
             get() = _rejectBookingState
 
-        private val _acceptBookingState: MutableStateFlow<StateEvent<Booking>> =
+        private val _cancelReasonState: MutableStateFlow<StateEvent<List<BookingCancelReason>>> =
             MutableStateFlow(StateEvent.Idle())
-        override val acceptBookingState: StateFlow<StateEvent<Booking>>
-            get() = _acceptBookingState
+        override val cancelReasonState: StateFlow<StateEvent<List<BookingCancelReason>>>
+            get() = _cancelReasonState
+
+        private val _estimatedDuration = MutableStateFlow("")
+        override val estimatedDuration: StateFlow<String>
+            get() = _estimatedDuration
+
+        private val _pickupRoute: MutableStateFlow<StateEvent<Booking.Routes>> =
+                MutableStateFlow(StateEvent.Idle())
+        override val pickupRoute: StateFlow<StateEvent<Booking.Routes>>
+            get() = _pickupRoute
+
+        init {
+            IOScope().launch {
+                bindToState(
+                    stateFlow = _cancelReasonState,
+                    onFetch = {
+                        webServices.reasonBookingCustomer()
+                    },
+                    mapper = {
+                        it.data.orEmpty().filterNotNull()
+                            .map { response ->
+                                BookingCancelReason(
+                                    id = response.id.orEmpty(),
+                                    name = response.name.orEmpty()
+                                )
+                            }
+                    }
+                )
+            }
+        }
 
         override suspend fun createBookingCustomer(
             fromLocationData: LocationData,
@@ -145,7 +185,7 @@ interface BookingRepository {
 
         override suspend fun acceptBookingDriver(bookingId: String) {
             bindToState(
-                stateFlow = _acceptBookingState,
+                stateFlow = _bookingCustomer,
                 onFetch = {
                     webServices.acceptBookingDriver(bookingId)
                 },
@@ -155,8 +195,44 @@ interface BookingRepository {
             )
         }
 
+        override suspend fun takeBookingDriver(bookingId: String) {
+            bindToState(
+                stateFlow = _bookingCustomer,
+                onFetch = {
+                    webServices.takeBookingDriver(bookingId)
+                },
+                mapper = {
+                    BookingMapper.mapResponseToBooking(it)
+                }
+            )
+        }
+
+        override suspend fun completeBookingDriver(bookingId: String) {
+            bindToState(
+                stateFlow = _bookingCustomer,
+                onFetch = {
+                    webServices.completeBookingDriver(bookingId)
+                },
+                mapper = {
+                    BookingMapper.mapResponseToBooking(it)
+                }
+            )
+        }
+
         override suspend fun restartStateBookingCustomer() {
             _bookingCustomer.value = StateEvent.Idle()
+        }
+
+        override suspend fun updateEstimatedDuration(updated: String) {
+            _estimatedDuration.value = updated
+        }
+
+        override suspend fun updatePickupRoute(routes: Booking.Routes) {
+            _pickupRoute.value = StateEvent.Success(routes)
+        }
+
+        override suspend fun clearPickupRoute() {
+            _pickupRoute.value = StateEvent.Idle()
         }
     }
 

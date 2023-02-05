@@ -13,7 +13,7 @@ data class Booking(
     data class RouteLocation(
         var from: LocationAddress = LocationAddress(),
         var destination: LocationAddress = LocationAddress(),
-        var routes: Routes = Routes(emptyList(), 0L)
+        var routes: Routes = Routes(emptyList(), 0L, 0L)
     )
 
     enum class BookingStatus {
@@ -43,6 +43,7 @@ data class Booking(
 
     data class Routes(
         val route: List<Coordinate>,
-        val distance: Long
+        val distance: Long,
+        val durationEstimated: Long
     )
 }

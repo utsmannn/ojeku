@@ -114,6 +114,14 @@ class HomeViewModel(
         }
     }
 
+    fun updateEstimatedDuration(duration: String) = viewModelScope.launch {
+        bookingRepository.updateEstimatedDuration(duration)
+    }
+
+    fun clearEstimatedDuration() = viewModelScope.launch {
+        bookingRepository.updateEstimatedDuration("")
+    }
+
     fun setClearThrowableHandler() {
         _throwable = MutableStateFlow(null)
     }

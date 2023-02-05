@@ -18,9 +18,7 @@ import com.utsman.core.state.StateEventSubscriber
 import com.utsman.core.view.component.InputLocationView
 import com.utsman.geolib.marker.moveMarker
 import com.utsman.geolib.polyline.PolylineAnimatorBuilder
-import com.utsman.geolib.polyline.data.PolylineConfig
 import com.utsman.geolib.polyline.data.StackAnimationMode
-import com.utsman.geolib.polyline.point.PointPolyline
 import com.utsman.geolib.polyline.polyline.PolylineAnimator
 import com.utsman.geolib.polyline.utils.createPolylineAnimatorBuilder
 import com.utsman.locationapi.entity.LocationData
@@ -37,6 +35,7 @@ import com.utsman.ojeku.home.fragment.controlpanel.*
 import com.utsman.ojeku.home.viewmodel.HomeViewModel
 import com.utsman.utils.BindingFragment
 import com.utsman.utils.isGrantedLocation
+import com.utsman.utils.orNol
 import com.utsman.utils.snackBar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -63,6 +62,7 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), /*HomeFragmentListe
     private var isSkipLoading = false
 
     private var driverMarker: Marker? = null
+    private var otherMarker: Marker? = null
     private var currentPolyline: Polyline? = null
 
     private val locationPermissionRequest = registerForActivityResult(
@@ -173,6 +173,7 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), /*HomeFragmentListe
             }
             it.onSuccess {
                 map.clear()
+                driverMarker?.remove()
                 driverMarker = null
                 currentPolyline = null
 
@@ -208,14 +209,17 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), /*HomeFragmentListe
                     }
                     Booking.BookingStatus.CANCELED -> {
                         viewModel.setLocationDest(LocationData())
+                        viewModel.clearEstimatedDuration()
                         navigateToLocationListFragment()
                     }
                     Booking.BookingStatus.REQUEST_RETRY -> {
                         viewModel.retryBooking()
                     }
                     Booking.BookingStatus.ACCEPTED -> {
-                        navigateToPickupFragment()
-                        binding.snackBar("Accepted -> ${this.driverId}")
+                        navigateToPickupOngoingFragment()
+                    }
+                    Booking.BookingStatus.ONGOING -> {
+                        navigateToPickupOngoingFragment()
                     }
                     else -> {}
                 }
@@ -227,6 +231,7 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), /*HomeFragmentListe
                     binding.snackBar(message)
                 }
 
+                this.printStackTrace()
                 navigateToLocationListFragment()
             }
         }
@@ -248,11 +253,20 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), /*HomeFragmentListe
             }
 
         CoroutineBus.getInstance()
-            .getLiveData<ServiceMessage>(ServiceMessage.Type.BOOKING_LOCATION.name, lifecycleScope)
+            .getLiveData<UpdateLocationBooking>("update_routes_booking", lifecycleScope)
             .observe(this) {
-                val currentBooking = viewModel.bookingState.value?.value
+                /*val currentBooking = viewModel.bookingState.value?.value
                 if (currentBooking != null && currentBooking.status == Booking.BookingStatus.ACCEPTED) {
-                    setupDecoratedMapsBookingAccepted(currentBooking, it)
+                    setupDecoratedMapsBookingAcceptedOnGoing(currentBooking, it)
+                }*/
+
+                val currentBooking = viewModel.bookingState.value?.value
+                val isStatusValid = when (currentBooking?.status) {
+                    Booking.BookingStatus.ACCEPTED, Booking.BookingStatus.ONGOING -> true
+                    else -> false
+                }
+                if (currentBooking != null && isStatusValid) {
+                    setupDecoratedMapsBookingAcceptedOnGoing(currentBooking, it)
                 }
             }
     }
@@ -374,13 +388,33 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), /*HomeFragmentListe
         }
     }
 
-    private fun setupDecoratedMapsBookingAccepted(booking: Booking, serviceMessage: ServiceMessage) {
-        val pickupCoordinate = booking.routeLocation.from.coordinate
+    private fun setupDecoratedMapsBookingAcceptedOnGoing(booking: Booking, updateLocationBooking: UpdateLocationBooking) {
+        val (destinationCoordinate, otherMarkerVector) = when (booking.status) {
+            Booking.BookingStatus.ACCEPTED -> {
+                Pair(booking.routeLocation.from.coordinate, BookingDrawable.ic_marker_start)
+            }
+            Booking.BookingStatus.ONGOING -> {
+                Pair(booking.routeLocation.destination.coordinate, BookingDrawable.ic_marker_finish)
+            }
+            else -> return
+        }
 
-        val updateLocationBooking = serviceMessage.json.fromJson<UpdateLocationBooking>()
         val driverCoordinate = updateLocationBooking.driver.toCoordinate()
         val geometries = updateLocationBooking.route?.toRoutes()?.route.orEmpty().map { coor ->
             LatLng(coor.latitude, coor.longitude)
+        }
+
+        val durationEstimated = updateLocationBooking.route?.durationEstimated.orNol()
+        if (durationEstimated > 1) {
+            val baseDuration = durationEstimated / 60L
+            val durationText = if (baseDuration - 2 >= 1) {
+                val estimated = baseDuration - 2
+                "Estimated time $estimated - $baseDuration min"
+            } else {
+                "Estimated time ~ $baseDuration min"
+            }
+
+            viewModel.updateEstimatedDuration(durationText)
         }
 
         if (driverMarker == null) {
@@ -390,10 +424,10 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), /*HomeFragmentListe
                     .iconResVector(CoreDrawable.ic_marker_driver, requireContext())
             )
 
-            map.addMarker(
+            otherMarker = map.addMarker(
                 MarkerOptions()
-                    .position(LatLng(pickupCoordinate.latitude, pickupCoordinate.longitude))
-                    .iconResVector(BookingDrawable.ic_marker_start, requireContext())
+                    .position(LatLng(destinationCoordinate.latitude, destinationCoordinate.longitude))
+                    .iconResVector(otherMarkerVector, requireContext())
             )
 
         } else {
@@ -409,51 +443,21 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), /*HomeFragmentListe
                     .endCap(RoundCap())
                     .startCap(RoundCap())
             )
+
+            val boundingBox = LatLngBounds.builder()
+                .also {
+                    geometries.forEach { geo ->
+                        it.include(geo)
+                    }
+                }
+                .build()
+
+            map.animateCamera(
+                CameraUpdateFactory.newLatLngBounds(boundingBox, 12)
+            )
         } else {
             currentPolyline?.points = geometries
         }
-
-        /*CoroutineBus.getInstance()
-            .getLiveData<ServiceMessage>(ServiceMessage.Type.BOOKING_LOCATION.name, lifecycleScope)
-            .observe(this) {
-                val pickupCoordinate = booking.routeLocation.from.coordinate
-
-                val updateLocationBooking = it.json.fromJson<UpdateLocationBooking>()
-                val driverCoordinate = updateLocationBooking.driver.toCoordinate()
-                val geometries = updateLocationBooking.route?.toRoutes()?.route.orEmpty().map { coor ->
-                    LatLng(coor.latitude, coor.longitude)
-                }
-
-                if (driverMarker == null) {
-                    driverMarker = map.addMarker(
-                        MarkerOptions()
-                            .position(LatLng(driverCoordinate.latitude, driverCoordinate.longitude))
-                            .iconResVector(CoreDrawable.ic_marker_driver, requireContext())
-                    )
-
-                    map.addMarker(
-                        MarkerOptions()
-                            .position(LatLng(pickupCoordinate.latitude, pickupCoordinate.longitude))
-                            .iconResVector(BookingDrawable.ic_marker_start, requireContext())
-                    )
-
-                } else {
-                    driverMarker?.moveMarker(LatLng(driverCoordinate.latitude, driverCoordinate.longitude), true)
-                }
-
-                if (currentPolyline == null) {
-                    currentPolyline = map.addPolyline(
-                        PolylineOptions()
-                            .addAll(geometries)
-                            .width(8f)
-                            .color(ContextCompat.getColor(requireContext(), com.utsman.core.R.color.green))
-                            .endCap(RoundCap())
-                            .startCap(RoundCap())
-                    )
-                } else {
-                    currentPolyline?.points = geometries
-                }
-            }*/
     }
 
     override fun navigateToLoading() {
@@ -488,10 +492,10 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), /*HomeFragmentListe
         updateMapsPadding()
     }
 
-    override fun navigateToPickupFragment() {
+    override fun navigateToPickupOngoingFragment() {
         panelTag = childFragmentManager.replaceFragment(
             binding.framePanelControl,
-            PickupPanelControlFragment::class
+            PickupOngoingPanelControlFragment::class
         )
         updateMapsPadding()
     }

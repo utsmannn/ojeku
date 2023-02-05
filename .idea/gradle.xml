@@ -29,6 +29,7 @@
             <option value="$PROJECT_DIR$/shared/koin" />
             <option value="$PROJECT_DIR$/shared/navigation" />
             <option value="$PROJECT_DIR$/shared/network" />
+            <option value="$PROJECT_DIR$/shared/socket" />
             <option value="$PROJECT_DIR$/shared/utils" />
           </set>
         </option>

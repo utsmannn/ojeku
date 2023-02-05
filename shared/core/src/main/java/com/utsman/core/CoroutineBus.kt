@@ -3,10 +3,7 @@ package com.utsman.core
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 
@@ -31,6 +28,14 @@ class CoroutineBus {
             .filter { it.key == key }
             .map { it.data as T }
             .asLiveData(coroutineScope.coroutineContext)
+    }
+
+    suspend fun <T> getFlow(key: String, coroutineScope: CoroutineScope): StateFlow<T> {
+        return stateBus
+            .filterNotNull()
+            .filter { it.key == key }
+            .map { it.data as T }
+            .stateIn(coroutineScope)
     }
 
     companion object : KoinComponent {

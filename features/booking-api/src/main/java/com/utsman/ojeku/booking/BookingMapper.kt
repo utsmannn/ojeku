@@ -31,11 +31,12 @@ object BookingMapper {
         }
 
         val distance = routeLocationResponse?.routes?.distance.orNol()
+        val durationEstimated = routeLocationResponse?.routes?.durationEstimated.orNol()
 
         val routeData = Booking.RouteLocation(
             from = locationAddressFromData,
             destination = locationAddressDestData,
-            routes = Booking.Routes(coordinate, distance)
+            routes = Booking.Routes(coordinate, distance, durationEstimated)
         )
 
         return Booking(

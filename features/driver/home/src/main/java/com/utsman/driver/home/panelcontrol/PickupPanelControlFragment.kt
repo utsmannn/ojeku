@@ -29,18 +29,26 @@ class PickupPanelControlFragment : BindingFragment<FragmentPanelControlPickupBin
                 binding.tvCustAddress.text = pickupAddress
 
                 viewModel.getCustomer(customerId)
-                val distance = routeLocation.routes.distance.toFloat()
-                val distanceIsMeters = when {
-                    distance < 1000.0 -> "~ ${distance.roundToInt()} M"
-                    else -> String.format("~ %.2f KM", distance / 1000.0)
+                binding.btnTakeCustomer.setOnClickListener {
+                    viewModel.takeCustomer(id)
                 }
-                binding.tvDistance.text = distanceIsMeters
             }
         }
 
         viewModel.customerState.observe(this) {
             it.onSuccess {
                 binding.tvCustName.text = username
+            }
+        }
+
+        viewModel.pickupRouteState.observe(this) {
+            it.onSuccess {
+                val distance = distance.toFloat()
+                val distanceIsMeters = when {
+                    distance < 1000.0 -> "~ ${distance.roundToInt()} M"
+                    else -> String.format("~ %.2f KM", distance / 1000.0)
+                }
+                binding.tvDistance.text = distanceIsMeters
             }
         }
     }

@@ -2,7 +2,7 @@ package com.utsman.ojeku.home.di
 
 import com.utsman.ojeku.home.fragment.controlpanel.BookingPanelControlViewModel
 import com.utsman.ojeku.home.fragment.controlpanel.LocationListPanelControlViewModel
-import com.utsman.ojeku.home.fragment.controlpanel.PickupPanelControlViewModel
+import com.utsman.ojeku.home.fragment.controlpanel.PickupOngoingPanelControlViewModel
 import com.utsman.ojeku.home.fragment.controlpanel.ReadyPanelControlViewModel
 import com.utsman.ojeku.home.repo.HomeRepository
 import com.utsman.ojeku.home.repo.HomeRepositoryImpl
@@ -19,6 +19,6 @@ object HomeModule {
         viewModel { LocationListPanelControlViewModel(get(), get()) }
         viewModel { ReadyPanelControlViewModel(get()) }
         viewModel { BookingPanelControlViewModel(get()) }
-        viewModel { PickupPanelControlViewModel(get(), get()) }
+        viewModel { PickupOngoingPanelControlViewModel(get(), get()) }
     }
 }

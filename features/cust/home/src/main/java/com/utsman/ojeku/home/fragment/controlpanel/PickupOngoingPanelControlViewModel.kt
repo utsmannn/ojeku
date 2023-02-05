@@ -7,13 +7,14 @@ import com.ojeku.profile.repository.ProfileRepository
 import com.utsman.ojeku.booking.BookingRepository
 import kotlinx.coroutines.launch
 
-class PickupPanelControlViewModel(
+class PickupOngoingPanelControlViewModel(
     private val bookingRepository: BookingRepository,
     private val profileRepository: ProfileRepository
 ) : ViewModel() {
 
     val bookingState = bookingRepository.bookingCustomer.asLiveData(viewModelScope.coroutineContext)
     val driverState = profileRepository.otherUserState.asLiveData(viewModelScope.coroutineContext)
+    val estimatedDuration = bookingRepository.estimatedDuration.asLiveData(viewModelScope.coroutineContext)
 
     fun cancel(bookingId: String) = viewModelScope.launch {
         bookingRepository.cancelBookingCustomer(bookingId)

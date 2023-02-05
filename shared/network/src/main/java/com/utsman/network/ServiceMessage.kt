@@ -19,7 +19,7 @@ data class ServiceMessage(
 ) : EquatableProvider(bookingId) {
 
     enum class Type {
-        GENERAL, BOOKING, BOOKING_UNAVAILABLE, BOOKING_LOCATION
+        GENERAL, BOOKING, BOOKING_REQUEST, BOOKING_UNAVAILABLE, BOOKING_LOCATION
     }
 
     companion object {

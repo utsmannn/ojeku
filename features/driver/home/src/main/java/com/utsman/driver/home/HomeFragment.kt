@@ -6,33 +6,33 @@ import android.view.LayoutInflater
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatDialog
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
-import com.ojeku.profile.entity.User
+import com.google.android.gms.maps.model.*
 import com.ojeku.profile.entity.mapToDriverExtra
 import com.utsman.core.CoreDrawable
 import com.utsman.core.CoroutineBus
-import com.utsman.core.extensions.iconResVector
-import com.utsman.core.extensions.onSuccess
-import com.utsman.core.extensions.toJson
-import com.utsman.core.extensions.toLatLng
+import com.utsman.core.extensions.*
 import com.utsman.driver.home.databinding.DialogBookingOfferBinding
 import com.utsman.driver.home.databinding.FragmentHomeBinding
+import com.utsman.driver.home.panelcontrol.LoadingPanelControlFragment
 import com.utsman.driver.home.panelcontrol.PickupPanelControlFragment
+import com.utsman.driver.home.panelcontrol.OngoingPanelControlFragment
 import com.utsman.geolib.marker.moveMarker
 import com.utsman.navigation.replaceFragment
 import com.utsman.network.ServiceMessage
 import com.utsman.ojeku.booking.Booking
+import com.utsman.ojeku.booking.BookingDrawable
+import com.utsman.ojeku.booking.UpdateLocationBooking
 import com.utsman.ojeku.booking.rp
 import com.utsman.utils.BindingFragment
 import com.utsman.utils.isGrantedLocation
+import com.utsman.utils.snackBar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -45,7 +45,11 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomePanelFragmentNa
 
     private lateinit var panelTag: String
     private lateinit var map: GoogleMap
+
     private var driverMarker: Marker? = null
+    private var otherMarker: Marker? = null
+
+    private var currentPolyline: Polyline? = null
 
     private val dialogBookingOfferBinding: DialogBookingOfferBinding by lazy {
         DialogBookingOfferBinding.bind(
@@ -109,29 +113,98 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomePanelFragmentNa
             .getLiveData<ServiceMessage>(ServiceMessage.Type.BOOKING.name, lifecycleScope)
             .observe(this) { serviceMessage ->
                 val bookingId = serviceMessage.bookingId
-                println("Asuuuuuu -> get booking again")
                 viewModel.getBooking(bookingId)
             }
 
+        CoroutineBus.getInstance()
+            .getLiveData<ServiceMessage>(ServiceMessage.Type.BOOKING_LOCATION.name, lifecycleScope)
+            .observe(this) { serviceMessage ->
+                val currentBooking = viewModel.currentBooking.value?.value
+                if (currentBooking != null) {
+                    when (currentBooking.status) {
+                        Booking.BookingStatus.ONGOING -> {
+                            binding.snackBar("on going location")
+                        }
+                        else -> {}
+                    }
+                }
+            }
+
+        CoroutineBus.getInstance()
+            .getLiveData<ServiceMessage>(ServiceMessage.Type.BOOKING_REQUEST.name, lifecycleScope)
+            .observe(this) { serviceMessage ->
+                binding.snackBar("booking incoming....")
+                viewModel.isDisableFragmentLoading = true
+
+                val bookingId = serviceMessage.bookingId
+                viewModel.getBooking(bookingId)
+                viewModel.currentBookingId = serviceMessage.bookingId
+            }
+
+        CoroutineBus.getInstance()
+            .getLiveData<UpdateLocationBooking>("update_routes_booking", lifecycleScope)
+            .observe(this) {
+                val currentBooking = viewModel.currentBooking.value?.value
+                val isStatusValid = when (currentBooking?.status) {
+                    Booking.BookingStatus.ACCEPTED, Booking.BookingStatus.ONGOING -> true
+                    else -> false
+                }
+                if (currentBooking != null && isStatusValid) {
+                    setupDecorationMapsAcceptedOnGoing(currentBooking, it)
+                }
+            }
+
         viewModel.currentBooking.observe(this) {
+            it.onLoading {
+                if (!viewModel.isDisableFragmentLoading) {
+                    navigateToLoading()
+                }
+            }
             it.onSuccess {
-                println("asuuuuuuuu booking is -> ${this.toJson()}")
+                viewModel.isDisableFragmentLoading = false
+                viewModel.currentStatusBooking = this.status
+                hidePanel()
                 when (status) {
                     Booking.BookingStatus.REQUEST -> {
                         viewModel.getCustomer(this.customerId)
                         showBookingOfferDialog(this)
                     }
                     Booking.BookingStatus.CANCELED -> {
-                        hidePanel()
+                        otherMarker?.remove()
+                        otherMarker = null
+
+                        currentPolyline?.remove()
+                        currentPolyline = null
+                        viewModel.clearPickupRoute()
+                    }
+                    Booking.BookingStatus.ACCEPTED -> {
+                        navigateToPickup()
+                    }
+                    Booking.BookingStatus.ONGOING -> {
+                        otherMarker?.remove()
+                        otherMarker = null
+
+                        currentPolyline?.remove()
+                        currentPolyline = null
+                        viewModel.clearPickupRoute()
+                        navigateToOngoing()
                     }
                     else -> {}
                 }
             }
-        }
-
-        viewModel.acceptBooking.observe(this) {
-            it.onSuccess {
-                navigateToPickup()
+            it.onFailure {
+                if (viewModel.currentStatusBooking == Booking.BookingStatus.ACCEPTED) {
+                    binding.snackBar(this.message)
+                    val currentBookingId = viewModel.currentBookingId
+                    if (currentBookingId.isEmpty()) {
+                        hidePanel()
+                    } else {
+                        viewModel.getBooking(viewModel.currentBookingId)
+                    }
+                } else {
+                    viewModel.currentStatusBooking = Booking.BookingStatus.UNDEFINE
+                    hidePanel()
+                }
             }
         }
 
@@ -139,6 +212,82 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomePanelFragmentNa
             it.onSuccess {
 
             }
+        }
+    }
+
+    private fun setupDecorationMapsAcceptedOnGoing(
+        booking: Booking,
+        updateLocationBooking: UpdateLocationBooking
+    ) {
+        val (destinationCoordinate, otherMarkerVector) = when (booking.status) {
+            Booking.BookingStatus.ACCEPTED -> {
+                Pair(booking.routeLocation.from.coordinate, BookingDrawable.ic_marker_start)
+            }
+            Booking.BookingStatus.ONGOING -> {
+                Pair(booking.routeLocation.destination.coordinate, BookingDrawable.ic_marker_finish)
+            }
+            else -> return
+        }
+
+        val route = updateLocationBooking.route?.toRoutes()
+
+        if (route != null) {
+            viewModel.updatePickupRoute(route)
+        }
+
+        val driverCoordinate = updateLocationBooking.driver.toCoordinate()
+        val geometries = updateLocationBooking.route?.toRoutes()?.route.orEmpty().map { coor ->
+            LatLng(coor.latitude, coor.longitude)
+        }
+
+        if (driverMarker == null) {
+            driverMarker = map.addMarker(
+                MarkerOptions()
+                    .position(LatLng(driverCoordinate.latitude, driverCoordinate.longitude))
+                    .iconResVector(CoreDrawable.ic_marker_driver, requireContext())
+            )
+
+        } else {
+            driverMarker?.moveMarker(
+                LatLng(driverCoordinate.latitude, driverCoordinate.longitude),
+                true
+            )
+        }
+
+        if (currentPolyline == null) {
+            otherMarker = map.addMarker(
+                MarkerOptions()
+                    .position(
+                        LatLng(
+                            destinationCoordinate.latitude,
+                            destinationCoordinate.longitude
+                        )
+                    )
+                    .iconResVector(otherMarkerVector, requireContext())
+            )
+
+            currentPolyline = map.addPolyline(
+                PolylineOptions()
+                    .addAll(geometries)
+                    .width(8f)
+                    .color(ContextCompat.getColor(requireContext(), com.utsman.core.R.color.green))
+                    .endCap(RoundCap())
+                    .startCap(RoundCap())
+            )
+
+            val boundingBox = LatLngBounds.builder()
+                .also {
+                    geometries.forEach { geo ->
+                        it.include(geo)
+                    }
+                }
+                .build()
+
+            map.animateCamera(
+                CameraUpdateFactory.newLatLngBounds(boundingBox, 12)
+            )
+        } else {
+            currentPolyline?.points = geometries
         }
     }
 
@@ -220,9 +369,15 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomePanelFragmentNa
                         CameraUpdateFactory.newLatLngZoom(this.toLatLng(), 18f)
                     )
                 } else {
-                    map.animateCamera(
-                        CameraUpdateFactory.newLatLng(this.toLatLng())
-                    )
+                    if (map.cameraPosition.zoom < 12f) {
+                        map.animateCamera(
+                            CameraUpdateFactory.newLatLngZoom(this.toLatLng(), 18f)
+                        )
+                    } else {
+                        map.animateCamera(
+                            CameraUpdateFactory.newLatLng(this.toLatLng())
+                        )
+                    }
                 }
 
                 driverMarker?.moveMarker(toLatLng(), true)
@@ -244,6 +399,11 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomePanelFragmentNa
         binding.framePanelControl.isVisible = false
     }
 
+    override fun navigateToLoading() {
+        binding.framePanelControl.isVisible = true
+        navigateFragment(LoadingPanelControlFragment::class)
+    }
+
     override fun navigateToPickup() {
         binding.framePanelControl.isVisible = true
         navigateFragment(PickupPanelControlFragment::class)
@@ -251,22 +411,22 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomePanelFragmentNa
 
     override fun navigateToOngoing() {
         binding.framePanelControl.isVisible = true
-
+        navigateFragment(OngoingPanelControlFragment::class)
     }
 
     override fun navigateToComplete() {
         binding.framePanelControl.isVisible = true
     }
 
-    private fun <T: Fragment>navigateFragment(fragment: KClass<T>) {
+    private fun <T : Fragment> navigateFragment(fragment: KClass<T>) {
         panelTag = childFragmentManager.replaceFragment(
             binding.framePanelControl,
             fragment
         )
 
         lifecycleScope.launch {
-            delay(200)
-            map.setPadding(0, 0, 0, binding.framePanelControl.height)
+            delay(500)
+            map.setPadding(0, 0, 0, binding.framePanelControl.height + 24 * 3)
         }
     }
 }
