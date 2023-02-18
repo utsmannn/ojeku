@@ -1,5 +1,6 @@
 package com.utsman.driver.home
 
+import com.utsman.driver.home.panelcontrol.DonePanelControlViewModel
 import com.utsman.driver.home.panelcontrol.PickupPanelControlViewModel
 import com.utsman.driver.home.panelcontrol.OngoingPanelControlViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -13,5 +14,6 @@ object HomeModule {
         viewModel { HomeViewModel(get(), get(), get()) }
         viewModel { PickupPanelControlViewModel(get(), get(), get()) }
         viewModel { OngoingPanelControlViewModel(get(), get()) }
+        viewModel { DonePanelControlViewModel(get(), get()) }
     }
 }

@@ -20,6 +20,10 @@ class OngoingPanelControlFragment : BindingFragment<FragmentPanelControlOngoingB
         viewModel.bookingState.observe(this) {
             it.onSuccess {
                 renderControlPanel(this)
+
+                binding.btnFinish.setOnClickListener {
+                    viewModel.completeBooking(this.id)
+                }
             }
         }
     }

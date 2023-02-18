@@ -14,11 +14,13 @@ interface BookingRepository {
     val bookingCustomer: StateFlow<StateEvent<Booking>>
     val rejectBookingState: StateFlow<StateEvent<Boolean>>
     val cancelReasonState: StateFlow<StateEvent<List<BookingCancelReason>>>
+    val historyState: StateFlow<StateEvent<List<History>>>
 
     val estimatedDuration: StateFlow<String>
     val pickupRoute: StateFlow<StateEvent<Booking.Routes>>
 
     val cancelUiState: StateFlow<Boolean>
+    val doneUiState: StateFlow<Boolean>
 
     suspend fun createBookingCustomer(
         fromLocationData: LocationData,
@@ -39,6 +41,7 @@ interface BookingRepository {
     suspend fun acceptBookingDriver(bookingId: String)
     suspend fun takeBookingDriver(bookingId: String)
     suspend fun completeBookingDriver(bookingId: String)
+    suspend fun getHistory()
 
     suspend fun restartStateBookingCustomer()
 
@@ -49,6 +52,7 @@ interface BookingRepository {
     suspend fun getReason()
 
     fun cancelState(showCancelPanel: Boolean)
+    fun doneState(showDonePanel: Boolean)
 
     private class Impl(private val webServices: BookingWebServices) : BookingRepository,
         RepositoryProvider() {
@@ -68,6 +72,11 @@ interface BookingRepository {
         override val cancelReasonState: StateFlow<StateEvent<List<BookingCancelReason>>>
             get() = _cancelReasonState
 
+        private val _historyState: MutableStateFlow<StateEvent<List<History>>> =
+            MutableStateFlow(StateEvent.Idle())
+        override val historyState: StateFlow<StateEvent<List<History>>>
+            get() = _historyState
+
         private val _estimatedDuration = MutableStateFlow("")
         override val estimatedDuration: StateFlow<String>
             get() = _estimatedDuration
@@ -80,6 +89,10 @@ interface BookingRepository {
         private val _cancelUiState: MutableStateFlow<Boolean> = MutableStateFlow(false)
         override val cancelUiState: StateFlow<Boolean>
             get() = _cancelUiState
+
+        private val _doneUiState: MutableStateFlow<Boolean> = MutableStateFlow(false)
+        override val doneUiState: StateFlow<Boolean>
+            get() = _doneUiState
 
         override suspend fun createBookingCustomer(
             fromLocationData: LocationData,
@@ -209,6 +222,18 @@ interface BookingRepository {
             )
         }
 
+        override suspend fun getHistory() {
+            bindToState(
+                stateFlow = _historyState,
+                onFetch = {
+                    webServices.getActivity()
+                },
+                mapper = {
+                    BookingMapper.mapHistoryToData(it)
+                }
+            )
+        }
+
         override suspend fun restartStateBookingCustomer() {
             _bookingCustomer.value = StateEvent.Idle()
         }
@@ -245,6 +270,10 @@ interface BookingRepository {
 
         override fun cancelState(showCancelPanel: Boolean) {
             _cancelUiState.value = showCancelPanel
+        }
+
+        override fun doneState(showDonePanel: Boolean) {
+            _doneUiState.value = showDonePanel
         }
     }
 

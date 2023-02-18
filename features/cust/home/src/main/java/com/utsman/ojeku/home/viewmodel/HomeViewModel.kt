@@ -47,6 +47,8 @@ class HomeViewModel(
 
     val cancelUiState = bookingRepository.cancelUiState.asLiveData(viewModelScope.coroutineContext)
 
+    val doneUiState = bookingRepository.doneUiState.asLiveData(viewModelScope.coroutineContext)
+
     val filledLocationState: LiveData<Triple<Boolean, LocationData, LocationData>>
         get() {
             return repository.locationFrom.combine(repository.locationDestination) { from, dest ->
@@ -118,5 +120,9 @@ class HomeViewModel(
 
     fun setClearThrowableHandler() {
         _throwable = MutableStateFlow(null)
+    }
+
+    fun showDonePanel(isShow: Boolean) = viewModelScope.launch {
+        bookingRepository.doneState(isShow)
     }
 }

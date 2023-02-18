@@ -63,6 +63,9 @@ interface BookingWebServices {
         @Query("booking_id") bookingId: String
     ): Response<BookingResponse>
 
+    @GET("/api/booking/activity")
+    suspend fun getActivity(): Response<HistoryResponse>
+
     companion object : KoinComponent {
         private val retrofitBuilder: RetrofitBuilder by inject()
         fun build(): BookingWebServices {

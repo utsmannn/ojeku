@@ -39,6 +39,8 @@ object BookingMapper {
             routes = Booking.Routes(coordinate, distance, durationEstimated)
         )
 
+        val timeString = data?.time?.timeString.orEmpty()
+
         return Booking(
             id = data?.id.orEmpty(),
             customerId = data?.customerId.orEmpty(),
@@ -50,7 +52,21 @@ object BookingMapper {
             ),
             transType = Booking.TransType.valueOf(
                 data?.transType ?: Booking.TransType.BIKE.name
-            )
+            ),
+            time = timeString
         )
+    }
+
+    fun mapHistoryToData(data: HistoryResponse?): List<History> {
+        val mapper: (HistoryResponse.DataResponse) -> History = {
+            History(
+                it.id.orEmpty(),
+                it.price.orNol(),
+                it.transType.orEmpty(),
+                it.time?.timeString.orEmpty()
+            )
+        }
+
+        return data?.data?.filterNotNull().orEmpty().map(mapper)
     }
 }

@@ -25,7 +25,9 @@ data class BookingResponse(
         @SerializedName("status")
         var status: String? = null,
         @SerializedName("trans_type")
-        var transType: String? = null
+        var transType: String? = null,
+        @SerializedName("time")
+        var time: TimeResponse? = null
     ) {
         data class RouteLocationResponse(
             @SerializedName("from")
@@ -77,4 +79,13 @@ data class BookingResponse(
             }
         }
     }
+
+    data class TimeResponse(
+        @SerializedName("local_date")
+        var localDate: String? = null,
+        @SerializedName("millis")
+        var millis: Long? = null,
+        @SerializedName("time_string")
+        var timeString: String? = null
+    )
 }

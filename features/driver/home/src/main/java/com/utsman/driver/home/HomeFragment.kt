@@ -3,11 +3,16 @@ package com.utsman.driver.home
 import android.Manifest
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.ViewGroup.LayoutParams
+import android.view.ViewGroup.MarginLayoutParams
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updateMargins
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -20,6 +25,7 @@ import com.utsman.core.CoroutineBus
 import com.utsman.core.extensions.*
 import com.utsman.driver.home.databinding.DialogBookingOfferBinding
 import com.utsman.driver.home.databinding.FragmentHomeBinding
+import com.utsman.driver.home.panelcontrol.DonePanelControlFragment
 import com.utsman.driver.home.panelcontrol.LoadingPanelControlFragment
 import com.utsman.driver.home.panelcontrol.PickupPanelControlFragment
 import com.utsman.driver.home.panelcontrol.OngoingPanelControlFragment
@@ -99,6 +105,8 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomePanelFragmentNa
         val mapFragment = childFragmentManager
             .findFragmentById(R.id.map_view) as SupportMapFragment
 
+        binding.linTopPanel.isVisible = false
+
         hidePanel()
         mapFragment.getMapAsync {
             map = it
@@ -154,8 +162,17 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomePanelFragmentNa
                 }
             }
 
+        viewModel.doneUiState.observe(this@HomeFragment) { isDone ->
+            if (isDone) {
+                navigateToDone()
+            } else {
+                hidePanel()
+            }
+        }
+
         viewModel.currentBooking.observe(this) {
             it.onLoading {
+                viewModel.showDonePanel(false)
                 if (!viewModel.isDisableFragmentLoading) {
                     navigateToLoading()
                 }
@@ -170,24 +187,18 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomePanelFragmentNa
                         showBookingOfferDialog(this)
                     }
                     Booking.BookingStatus.CANCELED -> {
-                        otherMarker?.remove()
-                        otherMarker = null
-
-                        currentPolyline?.remove()
-                        currentPolyline = null
-                        viewModel.clearPickupRoute()
+                        clearMaps()
                     }
                     Booking.BookingStatus.ACCEPTED -> {
                         navigateToPickup()
                     }
                     Booking.BookingStatus.ONGOING -> {
-                        otherMarker?.remove()
-                        otherMarker = null
-
-                        currentPolyline?.remove()
-                        currentPolyline = null
-                        viewModel.clearPickupRoute()
+                        clearMaps()
                         navigateToOngoing()
+                    }
+                    Booking.BookingStatus.DONE -> {
+                        clearMaps()
+                        viewModel.showDonePanel(true)
                     }
                     else -> {}
                 }
@@ -213,6 +224,15 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomePanelFragmentNa
 
             }
         }
+    }
+
+    private fun clearMaps() {
+        otherMarker?.remove()
+        otherMarker = null
+
+        currentPolyline?.remove()
+        currentPolyline = null
+        viewModel.clearPickupRoute()
     }
 
     private fun setupDecorationMapsAcceptedOnGoing(
@@ -406,16 +426,54 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomePanelFragmentNa
 
     override fun navigateToPickup() {
         binding.framePanelControl.isVisible = true
+        saveAndRestoreMargin()
         navigateFragment(PickupPanelControlFragment::class)
     }
 
     override fun navigateToOngoing() {
         binding.framePanelControl.isVisible = true
+        saveAndRestoreMargin()
         navigateFragment(OngoingPanelControlFragment::class)
     }
 
     override fun navigateToComplete() {
         binding.framePanelControl.isVisible = true
+    }
+
+    override fun navigateToDone() {
+        binding.framePanelControl.isVisible = true
+        binding.framePanelControl.updateLayoutParams<MarginLayoutParams> {
+            height = ConstraintLayout.LayoutParams.MATCH_PARENT
+            updateMargins(0, 0, 0, 0)
+        }
+        navigateFragment(DonePanelControlFragment::class)
+    }
+
+    private fun saveAndRestoreMargin() {
+        val currentMargin = viewModel.savedMargin
+        if (currentMargin != PanelMargin()) {
+            binding.framePanelControl.updateLayoutParams<MarginLayoutParams> {
+                height = ConstraintLayout.LayoutParams.WRAP_CONTENT
+                val panelMargin = PanelMargin(
+                    top = topMargin,
+                    bottom = bottomMargin,
+                    start = leftMargin,
+                    end = rightMargin
+                )
+                viewModel.savedMargin = panelMargin
+            }
+        } else {
+            binding.framePanelControl.updateLayoutParams<MarginLayoutParams> {
+                height = ConstraintLayout.LayoutParams.WRAP_CONTENT
+                val panelMargin = viewModel.savedMargin
+                updateMargins(
+                    left = panelMargin.start,
+                    right = panelMargin.end,
+                    top = panelMargin.top,
+                    bottom = panelMargin.bottom
+                )
+            }
+        }
     }
 
     private fun <T : Fragment> navigateFragment(fragment: KClass<T>) {

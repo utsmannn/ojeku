@@ -26,4 +26,7 @@ dependencies {
     // geolib
     implementation 'io.github.utsmannn:geolib-polyline:2.5.6'
     implementation 'io.github.utsmannn:geolib-marker:2.5.6'
+
+    // rating bar
+    implementation 'me.zhanghai.android.materialratingbar:library:1.4.0'
 }

@@ -24,9 +24,13 @@ class HomeViewModel(
     val rejectBooking =
         bookingRepository.rejectBookingState.asLiveData(viewModelScope.coroutineContext)
 
+    val doneUiState = bookingRepository.doneUiState.asLiveData(viewModelScope.coroutineContext)
+
     var isDisableFragmentLoading = false
     var currentStatusBooking = Booking.BookingStatus.UNDEFINE
     var currentBookingId = ""
+
+    var savedMargin: PanelMargin = PanelMargin()
 
     fun getLocation() = viewModelScope.launch {
         homeRepository.getLocation()
@@ -67,5 +71,9 @@ class HomeViewModel(
 
     fun clearPickupRoute() = viewModelScope.launch {
         bookingRepository.clearPickupRoute()
+    }
+
+    fun showDonePanel(isShow: Boolean) = viewModelScope.launch {
+        bookingRepository.doneState(isShow)
     }
 }

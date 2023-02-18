@@ -8,9 +8,11 @@ import com.utsman.core.extensions.fromJson
 import com.utsman.core.extensions.onFailure
 import com.utsman.core.extensions.onSuccess
 import com.utsman.core.extensions.setup
+import com.utsman.core.state.ContentUiState
 import com.utsman.navigation.activityNavigationCust
 import com.utsman.ojeku.booking.UpdateLocationBooking
 import com.utsman.ojeku.databinding.ActivityMainBinding
+import com.utsman.ojeku.home.fragment.HistoryListFragment
 import com.utsman.ojeku.home.fragment.HomeFragment
 import com.utsman.ojeku.socket.SocketWrapper
 import com.utsman.utils.BindingActivity
@@ -25,6 +27,7 @@ class MainActivity : BindingActivity<ActivityMainBinding>() {
     private val mainViewModel: MainViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        mainViewModel.postStateSplash()
         super.onCreate(savedInstanceState)
         mainViewModel.getCurrentUser()
         mainViewModel.userState.observe(this) { state ->
@@ -37,9 +40,23 @@ class MainActivity : BindingActivity<ActivityMainBinding>() {
                     activityNavigationCust().authActivityCustomer(this@MainActivity)
                     finish()
                 } else {
+                    mainViewModel.postStateContent()
                     lifecycleScope.launch {
                         setupSocket(username)
                     }
+                }
+            }
+        }
+
+        mainViewModel.contentUiState.observe(this) {
+            when (it) {
+                ContentUiState.Content -> {
+                    binding.contentLayout.isVisible = true
+                    binding.splashScreen.isVisible = false
+                }
+                ContentUiState.Splash -> {
+                    binding.contentLayout.isVisible = false
+                    binding.splashScreen.isVisible = true
                 }
             }
         }
@@ -75,7 +92,17 @@ class MainActivity : BindingActivity<ActivityMainBinding>() {
     override fun onCreateBinding(savedInstanceState: Bundle?) {
         binding.vpMain.setup(
             fragmentManager = supportFragmentManager,
-            HomeFragment()
+            HomeFragment(),
+            HistoryListFragment()
         )
+        binding.bnMain.setOnItemSelectedListener { menu ->
+            val currentItem = when(menu.itemId) {
+                R.id.action_search -> 0
+                R.id.action_activity -> 1
+                else -> 0
+            }
+            binding.vpMain.setCurrentItem(currentItem, true)
+            true
+        }
     }
 }

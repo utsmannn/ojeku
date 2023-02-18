@@ -7,7 +7,8 @@ data class Booking(
     var routeLocation: RouteLocation = RouteLocation(),
     var price: Double = 0.0,
     var status: BookingStatus = BookingStatus.READY,
-    var transType: TransType = TransType.BIKE
+    var transType: TransType = TransType.BIKE,
+    var time: String = ""
 ) {
 
     data class RouteLocation(

@@ -7,4 +7,5 @@ interface HomePanelFragmentNavigatorListener {
     fun navigateToPickup()
     fun navigateToOngoing()
     fun navigateToComplete()
+    fun navigateToDone()
 }

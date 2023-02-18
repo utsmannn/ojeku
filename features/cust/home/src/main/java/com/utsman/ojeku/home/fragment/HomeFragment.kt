@@ -37,6 +37,7 @@ import com.utsman.ojeku.home.databinding.DialogCancelBinding
 import com.utsman.ojeku.home.databinding.FragmentHomeBinding
 import com.utsman.ojeku.home.fragment.controlpanel.booking.BookingPanelControlFragment
 import com.utsman.ojeku.home.fragment.controlpanel.cancel.CancelPanelControlFragment
+import com.utsman.ojeku.home.fragment.controlpanel.done.DonePanelControlFragment
 import com.utsman.ojeku.home.fragment.controlpanel.loading.LoadingPanelControlFragment
 import com.utsman.ojeku.home.fragment.controlpanel.locationlist.LocationListPanelControlFragment
 import com.utsman.ojeku.home.fragment.controlpanel.pickupongoing.PickupOngoingPanelControlFragment
@@ -187,16 +188,26 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), /*HomeFragmentListe
             }
         }
 
+        viewModel.doneUiState.observe(this@HomeFragment) { isDone ->
+            if (isDone) {
+                navigateToDone()
+            } else {
+                navigateToLocationListFragment()
+            }
+        }
+
         viewModel.bookingState.observe(this) {
             it.onIdle {
                 navigateToLocationListFragment()
             }
             it.onLoading {
+                viewModel.showDonePanel(false)
                 if (!isSkipLoading) {
                     navigateToLoading()
                 }
             }
             it.onSuccess {
+                println("ojeku........ status -> ${this.status}")
                 map.clear()
                 driverMarker?.remove()
                 driverMarker = null
@@ -259,6 +270,9 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), /*HomeFragmentListe
                                 navigateToPickupOngoingFragment()
                             }
                         }
+                    }
+                    Booking.BookingStatus.DONE -> {
+                        viewModel.showDonePanel(true)
                     }
                     else -> {}
                 }
@@ -538,6 +552,14 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), /*HomeFragmentListe
         panelTag = childFragmentManager.replaceFragment(
             binding.framePanelControl,
             CancelPanelControlFragment::class
+        )
+        updateMapsPadding()
+    }
+
+    override fun navigateToDone() {
+        panelTag = childFragmentManager.replaceFragment(
+            binding.framePanelControl,
+            DonePanelControlFragment::class
         )
         updateMapsPadding()
     }

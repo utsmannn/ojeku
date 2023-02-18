@@ -7,19 +7,21 @@ import com.ojeku.profile.repository.ProfileRepository
 import com.utsman.ojeku.booking.BookingRepository
 import kotlinx.coroutines.launch
 
-class OngoingPanelControlViewModel(
+class DonePanelControlViewModel(
     private val bookingRepository: BookingRepository,
     private val profileRepository: ProfileRepository
 ) : ViewModel() {
 
-    val bookingState = bookingRepository.bookingCustomer.asLiveData(viewModelScope.coroutineContext)
+    val currentBooking =
+        bookingRepository.bookingCustomer.asLiveData(viewModelScope.coroutineContext)
+
     val customerState = profileRepository.otherUserState.asLiveData(viewModelScope.coroutineContext)
 
-    fun getCustomer(customerId: String) = viewModelScope.launch {
-        profileRepository.getCustomer(customerId)
+    fun getCustomer(driverId: String) = viewModelScope.launch {
+        profileRepository.getCustomer(driverId)
     }
 
-    fun completeBooking(bookingId: String) = viewModelScope.launch {
-        bookingRepository.completeBookingDriver(bookingId)
+    fun done() = viewModelScope.launch {
+        bookingRepository.doneState(false)
     }
 }
