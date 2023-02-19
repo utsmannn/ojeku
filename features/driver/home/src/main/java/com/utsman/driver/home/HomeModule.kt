@@ -15,5 +15,6 @@ object HomeModule {
         viewModel { PickupPanelControlViewModel(get(), get(), get()) }
         viewModel { OngoingPanelControlViewModel(get(), get()) }
         viewModel { DonePanelControlViewModel(get(), get()) }
+        viewModel { ProfileViewModel(get(), get()) }
     }
 }

@@ -9,6 +9,7 @@ import com.utsman.core.extensions.onFailure
 import com.utsman.core.extensions.onSuccess
 import com.utsman.core.extensions.setup
 import com.utsman.driver.home.HomeFragment
+import com.utsman.driver.home.ProfileFragment
 import com.utsman.navigation.activityNavigationCust
 import com.utsman.navigation.activityNavigationDriver
 import com.utsman.network.ServiceMessage
@@ -35,7 +36,8 @@ class MainActivity : BindingActivity<ActivityMainBinding>() {
         binding.snackBar(bookingId)
         binding.vpMain.setup(
             fragmentManager = supportFragmentManager,
-            HomeFragment()
+            HomeFragment(),
+            ProfileFragment()
         )
 
         viewModel.getCurrentUser()
@@ -71,6 +73,16 @@ class MainActivity : BindingActivity<ActivityMainBinding>() {
                     viewModel.updateFcmToken(task.result)
                 }
             }
+
+        binding.bnMain.setOnItemSelectedListener { menu ->
+            val currentItem = when(menu.itemId) {
+                R.id.action_search -> 0
+                R.id.action_profile -> 1
+                else -> 0
+            }
+            binding.vpMain.setCurrentItem(currentItem, true)
+            true
+        }
     }
 
     private suspend fun setupSocket(username: String) {
