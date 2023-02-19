@@ -1,4 +1,4 @@
-package com.utsman.ojeku.home.fragment
+package com.utsman.ojeku.home.fragment.home
 
 import android.Manifest
 import android.app.Dialog
@@ -207,13 +207,15 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), /*HomeFragmentListe
                 }
             }
             it.onSuccess {
-                println("ojeku........ status -> ${this.status}")
                 map.clear()
                 driverMarker?.remove()
                 driverMarker = null
                 currentPolyline = null
 
                 isSkipLoading = this.status == Booking.BookingStatus.REQUEST_RETRY
+
+                CoroutineBus.getInstance().post("update_history", 1)
+
                 when (status) {
                     Booking.BookingStatus.READY -> {
                         val currentFromLocationData = routeLocation.from.toLocationData()

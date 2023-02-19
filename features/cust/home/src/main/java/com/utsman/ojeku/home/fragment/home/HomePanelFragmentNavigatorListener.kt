@@ -1,4 +1,4 @@
-package com.utsman.ojeku.home.fragment
+package com.utsman.ojeku.home.fragment.home
 
 import com.utsman.utils.listener.FragmentListener
 

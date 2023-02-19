@@ -24,6 +24,7 @@ class RetrofitBuilder(private val tokenizer: Tokenizer) {
             .connectTimeout(2 * 60, TimeUnit.SECONDS)
             .readTimeout(2 * 60, TimeUnit.SECONDS)
             .writeTimeout(2 * 60, TimeUnit.SECONDS)
+            .addInterceptor(AuthInterceptor())
             .run {
                 if (isRequiredToken) {
                     addInterceptor { chain ->

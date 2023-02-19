@@ -7,6 +7,6 @@ object MainModule {
 
     fun modules() = module {
         single { ActivityNavigatorProvider.build() }
-        viewModel { MainViewModel(get()) }
+        viewModel { MainViewModel(get(), get()) }
     }
 }

@@ -12,8 +12,8 @@ import com.utsman.core.state.ContentUiState
 import com.utsman.navigation.activityNavigationCust
 import com.utsman.ojeku.booking.UpdateLocationBooking
 import com.utsman.ojeku.databinding.ActivityMainBinding
-import com.utsman.ojeku.home.fragment.HistoryListFragment
-import com.utsman.ojeku.home.fragment.HomeFragment
+import com.utsman.ojeku.home.fragment.home.HomeFragment
+import com.utsman.ojeku.home.fragment.history.HistoryFragment
 import com.utsman.ojeku.socket.SocketWrapper
 import com.utsman.utils.BindingActivity
 import kotlinx.coroutines.launch
@@ -31,10 +31,6 @@ class MainActivity : BindingActivity<ActivityMainBinding>() {
         super.onCreate(savedInstanceState)
         mainViewModel.getCurrentUser()
         mainViewModel.userState.observe(this) { state ->
-            state.onFailure {
-                activityNavigationCust().authActivityCustomer(this@MainActivity)
-                finish()
-            }
             state.onSuccess {
                 if (role == "DRIVER") {
                     activityNavigationCust().authActivityCustomer(this@MainActivity)
@@ -79,6 +75,12 @@ class MainActivity : BindingActivity<ActivityMainBinding>() {
             .observe(this) { isHide ->
                 binding.bnMain.isVisible = !isHide
             }
+
+        CoroutineBus.getInstance().getLiveData<Any>("app_unauthorized", lifecycleScope)
+            .observe(this) {
+                activityNavigationCust().authActivityCustomer(this@MainActivity)
+                finish()
+            }
     }
 
     private suspend fun setupSocket(username: String) {
@@ -93,7 +95,7 @@ class MainActivity : BindingActivity<ActivityMainBinding>() {
         binding.vpMain.setup(
             fragmentManager = supportFragmentManager,
             HomeFragment(),
-            HistoryListFragment()
+            HistoryFragment()
         )
         binding.bnMain.setOnItemSelectedListener { menu ->
             val currentItem = when(menu.itemId) {
@@ -103,6 +105,14 @@ class MainActivity : BindingActivity<ActivityMainBinding>() {
             }
             binding.vpMain.setCurrentItem(currentItem, true)
             true
+        }
+    }
+
+    override fun onBackPressed() {
+        if (mainViewModel.isHistoryDetail()) {
+            mainViewModel.backFromHistoryDetail()
+        } else {
+            super.onBackPressed()
         }
     }
 }

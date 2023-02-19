@@ -1,4 +1,4 @@
-package com.utsman.ojeku.home.fragment
+package com.utsman.ojeku.home.fragment.history
 
 import com.utsman.ojeku.booking.History
 

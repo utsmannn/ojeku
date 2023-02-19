@@ -105,8 +105,6 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomePanelFragmentNa
         val mapFragment = childFragmentManager
             .findFragmentById(R.id.map_view) as SupportMapFragment
 
-        binding.linTopPanel.isVisible = false
-
         hidePanel()
         mapFragment.getMapAsync {
             map = it
