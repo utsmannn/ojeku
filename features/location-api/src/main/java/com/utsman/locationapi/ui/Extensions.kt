@@ -48,6 +48,8 @@ fun ItemSearchLocationBinding.onBindAdapter(
     imgBookmark.setOnClickListener {
         onToggleClick.invoke()
     }
+
+    onBind.invoke(this)
 }
 
 // LatLng

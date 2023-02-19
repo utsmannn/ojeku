@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "1013560876146",
+    "project_id": "ojeku-app-d2d67",
+    "storage_bucket": "ojeku-app-d2d67.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1013560876146:android:622c22f7c237b50b6f36eb",
+        "android_client_info": {
+          "package_name": "com.utsman.ojeku"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1013560876146-b7otpu3gjmehq1er5b3fn333bshrk67b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1W_iIKt0wUTmoNghYVz1K-MjYdP6KMVs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1013560876146-b7otpu3gjmehq1er5b3fn333bshrk67b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1013560876146:android:d237d59dc4b04fef6f36eb",
+        "android_client_info": {
+          "package_name": "com.utsman.ojekudriver"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1013560876146-b7otpu3gjmehq1er5b3fn333bshrk67b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1W_iIKt0wUTmoNghYVz1K-MjYdP6KMVs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1013560876146-b7otpu3gjmehq1er5b3fn333bshrk67b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'com.google.gms.google-services'
 }
 
 apply from: "$rootDir/gradle/script/main.gradle"
@@ -20,6 +21,20 @@ android {
 }
 
 dependencies {
+    implementation project(":shared:network")
+    implementation project(":shared:utils")
     implementation project(":shared:core")
     implementation project(":shared:koin")
+    implementation project(":shared:navigation")
+    implementation project(":shared:socket")
+
+    implementation project(":features:auth")
+    implementation project(":features:location-api")
+    implementation project(":features:booking-api")
+    implementation project(":features:profile-api")
+
+    implementation project(":features:driver:home")
+
+    implementation platform('com.google.firebase:firebase-bom:31.2.0')
+    implementation 'com.google.firebase:firebase-messaging'
 }

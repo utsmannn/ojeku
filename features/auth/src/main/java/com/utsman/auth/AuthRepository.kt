@@ -12,7 +12,12 @@ interface AuthRepository {
     val registerState: StateFlow<StateEvent<Boolean>>
 
     suspend fun postLogin(username: String, password: String)
-    suspend fun postRegister(username: String, password: String)
+    suspend fun postRegister(
+        username: String,
+        password: String,
+        vehiclesNumber: String,
+        type: String
+    )
 
     suspend fun saveToken(token: String)
 
@@ -44,12 +49,22 @@ interface AuthRepository {
             )
         }
 
-        override suspend fun postRegister(username: String, password: String) {
+        override suspend fun postRegister(
+            username: String,
+            password: String,
+            vehiclesNumber: String,
+            type: String
+        ) {
             bindToState(
                 stateFlow = _registerState,
                 onFetch = {
-                    val request = SignRequest(username, password)
-                    authWebServices.registerCustomer(request)
+                    if (type == "customer") {
+                        val request = SignRequest(username, password)
+                        authWebServices.registerCustomer(request)
+                    } else {
+                        val request = SignRequest(username, password, vehiclesNumber)
+                        authWebServices.registerDriver(request)
+                    }
                 },
                 mapper = {
                     it.data ?: false

@@ -23,6 +23,8 @@ interface SearchLocationRepository {
     suspend fun toggleSaveLocation(locationData: LocationData)
     suspend fun isSavedLocation(locationData: LocationData): Boolean
 
+    suspend fun clearLocationState()
+
     private class Impl(
         private val webServices: LocationWebServices,
         private val savedLocationDao: SavedLocationDao
@@ -68,6 +70,10 @@ interface SearchLocationRepository {
 
         override suspend fun isSavedLocation(locationData: LocationData): Boolean {
             return savedLocationDao.isExists(locationData.latLng.toString())
+        }
+
+        override suspend fun clearLocationState() {
+            _locationState.value = StateEvent.Idle()
         }
 
         private fun invalidateLocationState(oldLocationData: List<LocationData>): List<LocationData> {

@@ -7,21 +7,25 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewParent
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentStatePagerAdapter
+import androidx.viewpager.widget.ViewPager
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.onStart
 
-fun <T: View> View.findIdByLazy(@IdRes id: Int): Lazy<T> {
+fun <T : View> View.findIdByLazy(@IdRes id: Int): Lazy<T> {
     return lazy { findViewById(id) }
 }
 
-fun <T: View> Activity.findIdByLazy(@IdRes id: Int): Lazy<T> {
+fun <T : View> Activity.findIdByLazy(@IdRes id: Int): Lazy<T> {
     return lazy { findViewById(id) }
 }
 
@@ -44,7 +48,8 @@ fun EditText.changes(): Flow<String> {
     }
 }
 
-fun Context.toast(message: String?) = Toast.makeText(this, message.orEmpty(), Toast.LENGTH_SHORT).show()
+fun Context.toast(message: String?) =
+    Toast.makeText(this, message.orEmpty(), Toast.LENGTH_SHORT).show()
 
 fun ViewGroup.inflateRoot(layoutRes: Int): View {
     return LayoutInflater.from(context).inflate(layoutRes, this, false)
@@ -57,4 +62,23 @@ fun Fragment.hideKeyboard() {
 fun Context.hideKeyboard(view: View) {
     val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
     inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+}
+
+
+private class ViewPagerAdapter(fragmentManager: FragmentManager, private vararg val fragments: Fragment) :
+    FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+
+    override fun getCount(): Int {
+        return fragments.size
+    }
+
+    override fun getItem(position: Int): Fragment {
+        return fragments[position]
+    }
+}
+
+fun ViewPager.setup(fragmentManager: FragmentManager, vararg fragment: Fragment) {
+    val pagerAdapter = ViewPagerAdapter(fragmentManager, *fragment)
+    offscreenPageLimit = fragment.size
+    adapter = pagerAdapter
 }

@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import org.json.JSONObject
 import retrofit2.Response
 
 val <T>StateEvent<T>.value: T?
@@ -87,11 +88,13 @@ fun <T, U> Response<T>.reducer(mapper: (T) -> U): StateEvent<U> {
                 StateEvent.Failure(e)
             } catch (e: Throwable) {
                 println("OJEKUUU======== network failure")
+                e.printStackTrace()
                 StateEvent.Failure(e)
             }
 
         } else {
-            val throwable = StateApiException(message(), code())
+            val errorBody = JSONObject(errorBody()?.string().orEmpty())
+            val throwable = StateApiException(errorBody.getString("message").orEmpty(), code())
             StateEvent.Failure(throwable)
         }
     } catch (e: Throwable) {
@@ -126,7 +129,8 @@ fun <T, U> Response<T>.asFlowStateEvent(mapper: (T) -> U): FlowState<U> {
                 }
 
             } else {
-                val throwable = StateApiException(message(), code())
+                val errorBody = JSONObject(errorBody()?.string().orEmpty())
+                val throwable = StateApiException(errorBody.getString("message").orEmpty(), code())
                 StateEvent.Failure(throwable)
             }
         } catch (e: Throwable) {
@@ -173,6 +177,12 @@ fun <T> StateEvent<T>.onFailure(action: Throwable.() -> Unit) {
 
 fun <T> StateEvent<T>.onEmpty(action: () -> Unit) {
     if (this is StateEvent.Empty) {
+        action.invoke()
+    }
+}
+
+fun <T> StateEvent<T>.onIdle(action: () -> Unit) {
+    if (this is StateEvent.Idle) {
         action.invoke()
     }
 }

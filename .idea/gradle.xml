@@ -15,17 +15,21 @@
             <option value="$PROJECT_DIR$/application/driver" />
             <option value="$PROJECT_DIR$/features" />
             <option value="$PROJECT_DIR$/features/auth" />
+            <option value="$PROJECT_DIR$/features/booking-api" />
             <option value="$PROJECT_DIR$/features/cust" />
             <option value="$PROJECT_DIR$/features/cust/home" />
             <option value="$PROJECT_DIR$/features/cust/profile" />
             <option value="$PROJECT_DIR$/features/cust/search" />
+            <option value="$PROJECT_DIR$/features/driver" />
+            <option value="$PROJECT_DIR$/features/driver/home" />
             <option value="$PROJECT_DIR$/features/location-api" />
-            <option value="$PROJECT_DIR$/features/transaction" />
+            <option value="$PROJECT_DIR$/features/profile-api" />
             <option value="$PROJECT_DIR$/shared" />
             <option value="$PROJECT_DIR$/shared/core" />
             <option value="$PROJECT_DIR$/shared/koin" />
             <option value="$PROJECT_DIR$/shared/navigation" />
             <option value="$PROJECT_DIR$/shared/network" />
+            <option value="$PROJECT_DIR$/shared/socket" />
             <option value="$PROJECT_DIR$/shared/utils" />
           </set>
         </option>

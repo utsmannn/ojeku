@@ -6,10 +6,11 @@ import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 class RetrofitBuilder(private val tokenizer: Tokenizer) {
     companion object {
-        private const val BASE_URL = "https://7023-2001-448a-2020-d758-a831-c9d8-b107-b0d2.ap.ngrok.io"
+        private const val BASE_URL = "https://nasty-turkey-78.telebit.io"
     }
 
     private fun okHttp(isRequiredToken: Boolean): OkHttpClient {
@@ -19,6 +20,11 @@ class RetrofitBuilder(private val tokenizer: Tokenizer) {
         return OkHttpClient()
             .newBuilder()
             .addInterceptor(logInterceptor)
+            .callTimeout(2 * 60, TimeUnit.SECONDS)
+            .connectTimeout(2 * 60, TimeUnit.SECONDS)
+            .readTimeout(2 * 60, TimeUnit.SECONDS)
+            .writeTimeout(2 * 60, TimeUnit.SECONDS)
+            .addInterceptor(AuthInterceptor())
             .run {
                 if (isRequiredToken) {
                     addInterceptor { chain ->

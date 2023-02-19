@@ -24,14 +24,14 @@ data class ReverseLocationResponse(
             val city: String?,
             @SerializedName("country")
             val country: String?,
-            @SerializedName("distric")
+            @SerializedName("district")
             val distric: String?
         )
 
         data class Coordinate(
-            @SerializedName("latitude")
+            @SerializedName("lat")
             val latitude: Double?,
-            @SerializedName("longitude")
+            @SerializedName("lng")
             val longitude: Double?
         )
     }
