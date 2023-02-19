@@ -15,7 +15,11 @@ object Mapper {
             val name = it?.name.orEmpty()
             val address = "${it?.address?.distric}, ${it?.address?.country}, ${it?.address?.city}"
             val latLng = LatLng(it?.coordinate?.latitude.orNol(), it?.coordinate?.longitude.orNol())
-            LocationData(name, address, latLng)
+            LocationData(
+                name = name,
+                address = address,
+                latLng = latLng
+            )
         }
 
         return locationResponse?.data?.map(mapperData).orEmpty()
@@ -26,11 +30,16 @@ object Mapper {
         val name = data.name.orEmpty()
         val address = "${data.address?.distric}, ${data.address?.country}, ${data.address?.city}"
         val latLng = LatLng(data.coordinate?.latitude.orNol(), data.coordinate?.longitude.orNol())
-        return LocationData(name, address, latLng)
+        return LocationData(
+            name = name,
+            address = address,
+            latLng = latLng
+        )
     }
 
     fun mapEntityToData(locationDataEntity: LocationDataEntity): LocationData {
         return LocationData(
+            id = locationDataEntity.id,
             name = locationDataEntity.name,
             address = locationDataEntity.address,
             latLng = locationDataEntity.latLng.toLatLng(),
@@ -40,6 +49,7 @@ object Mapper {
 
     fun mapDataToEntity(locationData: LocationData): LocationDataEntity {
         return LocationDataEntity(
+            id = locationData.id,
             name = locationData.name,
             address = locationData.address,
             latLng = locationData.latLng.toString(),

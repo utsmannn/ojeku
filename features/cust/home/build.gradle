@@ -23,7 +23,8 @@ dependencies {
     implementation project(":shared:core")
     implementation project(":shared:utils")
     implementation project(":shared:navigation")
-    
+    implementation project(":features:cust:search")
+
     implementation project(":features:location-api")
     implementation project(":features:booking-api")
     implementation project(":features:profile-api")

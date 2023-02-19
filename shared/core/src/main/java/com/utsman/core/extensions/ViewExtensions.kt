@@ -79,5 +79,6 @@ private class ViewPagerAdapter(fragmentManager: FragmentManager, private vararg 
 
 fun ViewPager.setup(fragmentManager: FragmentManager, vararg fragment: Fragment) {
     val pagerAdapter = ViewPagerAdapter(fragmentManager, *fragment)
+    offscreenPageLimit = fragment.size
     adapter = pagerAdapter
 }

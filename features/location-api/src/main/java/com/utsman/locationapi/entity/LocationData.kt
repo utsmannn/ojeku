@@ -9,6 +9,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class LocationData(
+    var id: Int = 0,
     var name: String = "",
     var address: String = "",
     var latLng: LatLng = LatLng(0.0, 0.0),

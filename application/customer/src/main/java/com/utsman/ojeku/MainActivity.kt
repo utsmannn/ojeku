@@ -14,6 +14,7 @@ import com.utsman.ojeku.booking.UpdateLocationBooking
 import com.utsman.ojeku.databinding.ActivityMainBinding
 import com.utsman.ojeku.home.fragment.home.HomeFragment
 import com.utsman.ojeku.home.fragment.history.HistoryFragment
+import com.utsman.ojeku.home.fragment.profile.ProfileFragment
 import com.utsman.ojeku.socket.SocketWrapper
 import com.utsman.utils.BindingActivity
 import kotlinx.coroutines.launch
@@ -95,12 +96,14 @@ class MainActivity : BindingActivity<ActivityMainBinding>() {
         binding.vpMain.setup(
             fragmentManager = supportFragmentManager,
             HomeFragment(),
-            HistoryFragment()
+            HistoryFragment(),
+            ProfileFragment()
         )
         binding.bnMain.setOnItemSelectedListener { menu ->
             val currentItem = when(menu.itemId) {
                 R.id.action_search -> 0
                 R.id.action_activity -> 1
+                R.id.action_user -> 2
                 else -> 0
             }
             binding.vpMain.setCurrentItem(currentItem, true)

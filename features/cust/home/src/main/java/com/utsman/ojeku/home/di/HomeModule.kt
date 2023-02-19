@@ -1,11 +1,15 @@
 package com.utsman.ojeku.home.di
 
+import com.utsman.ojeku.home.activity.EditLocationRepository
+import com.utsman.ojeku.home.activity.EditLocationViewModel
+import com.utsman.ojeku.home.activity.PickLocationViewModel
 import com.utsman.ojeku.home.fragment.controlpanel.booking.BookingPanelControlViewModel
 import com.utsman.ojeku.home.fragment.controlpanel.cancel.CancelPanelControlViewModel
 import com.utsman.ojeku.home.fragment.controlpanel.done.DonePanelControlViewModel
 import com.utsman.ojeku.home.fragment.controlpanel.locationlist.LocationListPanelControlViewModel
 import com.utsman.ojeku.home.fragment.controlpanel.pickupongoing.PickupOngoingPanelControlViewModel
 import com.utsman.ojeku.home.fragment.controlpanel.ready.ReadyPanelControlViewModel
+import com.utsman.ojeku.home.fragment.profile.ProfileViewModel
 import com.utsman.ojeku.home.viewmodel.HistoryViewModel
 import com.utsman.ojeku.home.repo.HomeRepository
 import com.utsman.ojeku.home.repo.HomeRepositoryImpl
@@ -22,6 +26,7 @@ object HomeModule {
         single { HistoryUiStateManager.build() }
 
         factory { LocationListRepository.build(get()) }
+        factory { EditLocationRepository.build(get()) }
 
         viewModel { HomeViewModel(get(), get()) }
         viewModel { LocationListPanelControlViewModel(get(), get()) }
@@ -33,5 +38,8 @@ object HomeModule {
         viewModel { HistoryViewModel(get()) }
         viewModel { HistoryListViewModel(get(), get()) }
         viewModel { HistoryDetailViewModel(get()) }
+        viewModel { ProfileViewModel(get(), get()) }
+        viewModel { EditLocationViewModel(get()) }
+        viewModel { PickLocationViewModel(get()) }
     }
 }
