@@ -129,7 +129,7 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomePanelFragmentNa
                 if (currentBooking != null) {
                     when (currentBooking.status) {
                         Booking.BookingStatus.ONGOING -> {
-                            binding.snackBar("on going location")
+
                         }
                         else -> {}
                     }
@@ -139,7 +139,6 @@ class HomeFragment : BindingFragment<FragmentHomeBinding>(), HomePanelFragmentNa
         CoroutineBus.getInstance()
             .getLiveData<ServiceMessage>(ServiceMessage.Type.BOOKING_REQUEST.name, lifecycleScope)
             .observe(this) { serviceMessage ->
-                binding.snackBar("booking incoming....")
                 viewModel.isDisableFragmentLoading = true
 
                 val bookingId = serviceMessage.bookingId
