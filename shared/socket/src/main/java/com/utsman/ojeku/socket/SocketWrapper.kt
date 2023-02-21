@@ -15,7 +15,7 @@ class SocketWrapper {
 
     fun connect() {
         socket = try {
-            IO.socket("https://7654-2001-448a-2020-f916-8129-6124-95f0-359d.ap.ngrok.io")
+            IO.socket("https://a288-2001-448a-2020-7c8b-ac58-3645-5498-daf9.ap.ngrok.io")
         } catch (e: URISyntaxException) {
             e.printStackTrace()
             null
